@@ -386,9 +386,7 @@
                     <div>
                         <label class="block text-xs font-bold uppercase tracking-wider text-gray-400 mb-2">Chọn máy chủ</label>
                         <select id="server-selector" onchange="updateSelectedServer()" class="w-full bg-gray-800/80 border border-gray-700 rounded-xl px-4 py-3 text-white focus:outline-none focus:border-discord text-sm">
-                            <option value="guild_1">Nexly Roblox Hub (Chính)</option>
-                            <option value="guild_2">Vanguard Esports VN</option>
-                            <option value="guild_3">Roblox Vietnam Studio</option>
+                            <!-- Các Server sẽ được load động từ Discord API ở đây -->
                         </select>
                     </div>
 
@@ -420,7 +418,7 @@
                     <div id="tab-content-overview" class="block space-y-8">
                         <div class="flex flex-col md:flex-row md:items-center justify-between gap-4">
                             <div>
-                                <h2 class="text-3xl font-extrabold text-white" id="active-guild-title">Nexly Roblox Hub</h2>
+                                <h2 class="text-3xl font-extrabold text-white" id="active-guild-title">Tải dữ liệu máy chủ...</h2>
                                 <p class="text-sm text-gray-400">Quản lý các kết nối vai trò, bảo mật và thiết lập máy chủ.</p>
                             </div>
                             <div class="flex space-x-2">
@@ -434,7 +432,7 @@
                         <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
                             <div class="bg-gray-800/20 border border-gray-800 p-6 rounded-2xl">
                                 <span class="text-gray-400 text-xs font-semibold uppercase">Tổng liên kết</span>
-                                <h3 class="text-3xl font-bold text-white mt-1" id="overview-binds-count">3 Binds</h3>
+                                <h3 class="text-3xl font-bold text-white mt-1" id="overview-binds-count">0 Binds</h3>
                                 <p class="text-xs text-blue-400 mt-2"><i class="fa-solid fa-arrow-trend-up"></i> Hoạt động tốt</p>
                             </div>
                             <div class="bg-gray-800/20 border border-gray-800 p-6 rounded-2xl">
@@ -671,29 +669,8 @@
             isLoggedIn: false,
             user: null,
             activeTab: 'overview',
-            currentGuild: 'guild_1',
-            guilds: {
-                guild_1: {
-                    name: "Nexly Roblox Hub",
-                    binds: [
-                        { id: 1, robloxGroupId: "32591024", rankId: "255", discordRole: "👑 Server Admin" },
-                        { id: 2, robloxGroupId: "32591024", rankId: "250", discordRole: "💻 Studio Developer" },
-                        { id: 3, robloxGroupId: "11405102", rankId: "1-100", discordRole: "⭐ Thành Viên VIP" }
-                    ]
-                },
-                guild_2: {
-                    name: "Vanguard Esports VN",
-                    binds: [
-                        { id: 4, robloxGroupId: "99823451", rankId: "120", discordRole: "🏆 Vanguard Elite" }
-                    ]
-                },
-                guild_3: {
-                    name: "Roblox Vietnam Studio",
-                    binds: [
-                        { id: 5, robloxGroupId: "44501259", rankId: "0-255", discordRole: "✅ Thành viên đã xác minh" }
-                    ]
-                }
-            }
+            currentGuild: null,
+            guilds: {} // Sẽ được đổ dữ liệu động từ Discord API
         };
 
         // QUẢN LÝ ĐIỀU HƯỚNG MÀN HÌNH (Single-Page App)
@@ -749,11 +726,29 @@
             });
         }
 
+        // ĐỔ DANH SÁCH MÁY CHỦ VÀO DROPDOWN
+        function populateServerSelector() {
+            const selector = document.getElementById('server-selector');
+            selector.innerHTML = ''; 
+            
+            if (Object.keys(state.guilds).length === 0) {
+                selector.innerHTML = '<option value="">Không có máy chủ (Cần quyền Quản trị viên)</option>';
+                selector.disabled = true;
+            } else {
+                selector.disabled = false;
+                for (const guildId in state.guilds) {
+                    const opt = document.createElement('option');
+                    opt.value = guildId;
+                    opt.textContent = state.guilds[guildId].name;
+                    selector.appendChild(opt);
+                }
+                selector.value = state.currentGuild;
+            }
+        }
+
         // UPDATE SELECTOR SERVER CHỮA ĐỔI BINDS
         function updateSelectedServer() {
             state.currentGuild = document.getElementById('server-selector').value;
-            const currentObj = state.guilds[state.currentGuild];
-            document.getElementById('active-guild-title').textContent = currentObj.name;
             updateDashboardUI();
         }
 
@@ -761,7 +756,24 @@
         function updateDashboardUI() {
             if (!state.isLoggedIn) return;
 
+            // Xử lý nếu người dùng không quản lý server nào
+            if (!state.currentGuild || !state.guilds[state.currentGuild]) {
+                document.getElementById('active-guild-title').textContent = "Không tìm thấy máy chủ";
+                document.getElementById('overview-binds-count').textContent = "0 Binds";
+                const tbody = document.getElementById('binds-table-body');
+                tbody.innerHTML = `
+                    <tr>
+                        <td colspan="4" class="py-8 text-center text-red-400 font-medium bg-red-500/5">
+                            <i class="fa-solid fa-triangle-exclamation text-2xl mb-2 block"></i>
+                            Tài khoản của bạn không có quyền Quản Trị Viên (Administrator) ở bất kỳ máy chủ nào.
+                        </td>
+                    </tr>
+                `;
+                return;
+            }
+
             const currentObj = state.guilds[state.currentGuild];
+            document.getElementById('active-guild-title').textContent = currentObj.name;
             
             // Cập nhật thông tin số lượng Binds lên thẻ tổng quan
             document.getElementById('overview-binds-count').textContent = `${currentObj.binds.length} Binds`;
@@ -810,7 +822,7 @@
             const cleanRedirectUrl = window.location.origin + basePath;
             const redirectUri = encodeURIComponent(cleanRedirectUrl);
             
-            // Gọi URL xác thực của Discord
+            // Gọi URL xác thực của Discord (yêu cầu thêm quyền guilds để lấy danh sách server)
             const oauthUrl = `https://discord.com/api/oauth2/authorize?client_id=${CLIENT_ID}&redirect_uri=${redirectUri}&response_type=token&scope=identify%20guilds`;
             window.location.href = oauthUrl;
         }
@@ -824,21 +836,20 @@
                 // Xóa token khỏi URL bar để giao diện sạch sẽ
                 window.history.replaceState({}, document.title, window.location.pathname + window.location.search);
                 
-                // Gọi Discord API để lấy thông tin người dùng
+                // 1. Gọi Discord API để lấy thông tin cá nhân người dùng
                 fetch('https://discord.com/api/users/@me', {
                     headers: {
                         authorization: `${tokenType} ${accessToken}`,
                     },
                 })
                 .then(result => result.json())
-                .then(response => {
-                    const { username, discriminator, avatar, id } = response;
+                .then(userResponse => {
+                    const { username, discriminator, avatar, id } = userResponse;
                     
-                    // Discord hiện đã chuyển sang dạng tên không có tag (#0), kiểm tra để hiển thị chuẩn xác
                     let displayTag = discriminator === '0' ? username : `${username}#${discriminator}`;
                     let avatarUrl = avatar 
                         ? `https://cdn.discordapp.com/avatars/${id}/${avatar}.png` 
-                        : 'https://cdn.discordapp.com/embed/avatars/0.png'; // Avatar mặc định
+                        : 'https://cdn.discordapp.com/embed/avatars/0.png';
 
                     state.isLoggedIn = true;
                     state.user = {
@@ -848,17 +859,48 @@
                         avatar: avatarUrl
                     };
 
+                    // 2. Tiếp tục gọi API để lấy danh sách máy chủ của họ
+                    return fetch('https://discord.com/api/users/@me/guilds', {
+                        headers: { authorization: `${tokenType} ${accessToken}` }
+                    });
+                })
+                .then(result => result.json())
+                .then(guilds => {
+                    state.guilds = {}; // Reset data máy chủ
+                    
+                    // Lọc ra các máy chủ mà người dùng có quyền Administrator (0x8)
+                    // Sử dụng BigInt để xử lý chuỗi phân quyền (permissions) chính xác từ Discord
+                    const adminGuilds = guilds.filter(g => (BigInt(g.permissions) & 8n) === 8n);
+
+                    if (adminGuilds.length > 0) {
+                        adminGuilds.forEach(g => {
+                            state.guilds[g.id] = {
+                                name: g.name,
+                                binds: [] // Bắt đầu với danh sách rỗng (Chưa có API Database thực)
+                            };
+                        });
+                        // Đặt máy chủ hiện hành là server đầu tiên trong danh sách
+                        state.currentGuild = adminGuilds[0].id;
+                    } else {
+                        state.currentGuild = null;
+                    }
+
+                    populateServerSelector();
                     updateNavbarState();
-                    // Tự động chuyển vào dashboard
+                    // Chuyển luôn vào Dashboard
                     navigateTo('dashboard');
                 })
-                .catch(console.error);
+                .catch(error => {
+                    console.error("Lỗi xác thực Discord:", error);
+                });
             }
         };
 
         function logout() {
             state.isLoggedIn = false;
             state.user = null;
+            state.guilds = {};
+            state.currentGuild = null;
             updateNavbarState();
             navigateTo('home');
         }
@@ -911,6 +953,7 @@
 
         // QUẢN LÝ BIND MỚI (TẠO/XÓA)
         function openAddBindModal() {
+            if(!state.currentGuild) return alert("Bạn không có máy chủ hợp lệ để tạo cấu hình.");
             document.getElementById('add-bind-modal').classList.remove('hidden');
         }
 
@@ -924,7 +967,7 @@
             const rankId = document.getElementById('bind-rank-id').value.trim();
             const role = document.getElementById('bind-discord-role').value;
 
-            if (groupId && rankId) {
+            if (groupId && rankId && state.currentGuild) {
                 const newBindObj = {
                     id: Date.now(),
                     robloxGroupId: groupId,
@@ -963,6 +1006,8 @@
         // LƯU FORM CÀI ĐẶT MÁY CHỦ
         function saveSettings(event) {
             event.preventDefault();
+            if(!state.currentGuild) return;
+            
             const prefix = document.getElementById('bot-prefix').value;
             const messageEl = document.getElementById('settings-status-message');
             
