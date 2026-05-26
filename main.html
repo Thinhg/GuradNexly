@@ -802,8 +802,14 @@
         const CLIENT_ID = '1501815620797202442'; // ID Bot của bạn
 
         function loginWithDiscord() {
-            // Lấy URL hiện tại làm redirect_uri (ví dụ: localhost hoặc domain của bạn)
-            const redirectUri = encodeURIComponent(window.location.href.split('#')[0]);
+            // Lấy URL gốc, loại bỏ "index.html" hoặc query thừa để tránh lỗi 404 trên Vercel/Netlify
+            let basePath = window.location.pathname;
+            if (basePath.endsWith('index.html')) {
+                basePath = basePath.replace('index.html', '');
+            }
+            const cleanRedirectUrl = window.location.origin + basePath;
+            const redirectUri = encodeURIComponent(cleanRedirectUrl);
+            
             // Gọi URL xác thực của Discord
             const oauthUrl = `https://discord.com/api/oauth2/authorize?client_id=${CLIENT_ID}&redirect_uri=${redirectUri}&response_type=token&scope=identify%20guilds`;
             window.location.href = oauthUrl;
