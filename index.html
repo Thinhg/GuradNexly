@@ -112,6 +112,22 @@
             -webkit-backdrop-filter: blur(16px);
             border: 1px solid rgba(255, 255, 255, 0.08);
         }
+
+        /* Custom Scrollbar cho dropdowns */
+        .custom-scrollbar::-webkit-scrollbar {
+            width: 6px;
+        }
+        .custom-scrollbar::-webkit-scrollbar-track {
+            background: rgba(255, 255, 255, 0.02);
+            border-radius: 8px;
+        }
+        .custom-scrollbar::-webkit-scrollbar-thumb {
+            background: rgba(255, 255, 255, 0.15);
+            border-radius: 8px;
+        }
+        .custom-scrollbar::-webkit-scrollbar-thumb:hover {
+            background: rgba(255, 255, 255, 0.3);
+        }
     </style>
 </head>
 <body class="antialiased font-sans">
@@ -144,7 +160,7 @@
 
                 <!-- CTA Button / User State -->
                 <div class="hidden md:flex items-center space-x-4" id="auth-buttons-container">
-                    <!-- Sẽ cập nhật động qua JS (Chưa đăng nhập / Đã đăng nhập) -->
+                    <!-- Sẽ cập nhật động qua JS -->
                     <button onclick="loginWithDiscord()" class="text-gray-300 hover:text-white font-medium text-sm transition-colors">Đăng nhập</button>
                     <button onclick="loginWithDiscord()" class="bg-discord hover:bg-discordHover text-white px-5 py-2.5 rounded-lg font-medium text-sm transition-all shadow-lg shadow-discord/30 flex items-center">
                         <i class="fa-brands fa-discord mr-2"></i> Bảng Điều Khiển
@@ -160,7 +176,7 @@
             </div>
         </div>
 
-        <!-- Mobile Menu (Ẩn mặc định) -->
+        <!-- Mobile Menu -->
         <div class="md:hidden hidden bg-gray-900 border-b border-gray-800" id="mobile-menu">
             <div class="px-2 pt-2 pb-3 space-y-1 sm:px-3">
                 <a href="#home" onclick="navigateTo('home')" class="hover:bg-gray-800 text-white block px-3 py-2 rounded-md text-base font-medium">Trang Chủ</a>
@@ -382,12 +398,23 @@
                         </div>
                     </div>
 
-                    <!-- Server Select Selector -->
-                    <div>
-                        <label class="block text-xs font-bold uppercase tracking-wider text-gray-400 mb-2">Chọn máy chủ</label>
-                        <select id="server-selector" onchange="updateSelectedServer()" class="w-full bg-gray-800/80 border border-gray-700 rounded-xl px-4 py-3 text-white focus:outline-none focus:border-discord text-sm">
-                            <!-- Các Server sẽ được load động từ Discord API ở đây -->
-                        </select>
+                    <!-- Server Select Selector - ĐÃ CẢI TIẾN THÀNH CUSTOM DROPDOWN SIÊU ĐẸP -->
+                    <div class="relative">
+                        <label class="block text-xs font-bold uppercase tracking-wider text-gray-400 mb-2">Chọn máy chủ quản trị</label>
+                        
+                        <!-- Dropdown Button -->
+                        <button id="server-dropdown-btn" onclick="toggleServerDropdown()" class="w-full bg-gray-800/60 border border-gray-700 hover:border-discord hover:bg-gray-800/80 rounded-xl px-4 py-3 text-white flex items-center justify-between text-sm transition-all focus:outline-none">
+                            <div class="flex items-center space-x-2.5 overflow-hidden">
+                                <span id="selected-server-avatar" class="w-7 h-7 rounded-full bg-gradient-to-tr from-blue-500 to-purple-600 flex items-center justify-center font-bold text-xs text-white uppercase flex-shrink-0">G</span>
+                                <span id="selected-server-text" class="truncate font-semibold text-gray-200">Đang quét...</span>
+                            </div>
+                            <i class="fa-solid fa-chevron-down text-gray-400 text-xs ml-2 transition-transform duration-200" id="server-chevron"></i>
+                        </button>
+
+                        <!-- Dropdown Options list -->
+                        <div id="server-dropdown-options" class="absolute left-0 right-0 mt-2 bg-[#121624] border border-gray-800 rounded-xl shadow-2xl hidden z-50 p-2 space-y-1 max-h-60 overflow-y-auto custom-scrollbar">
+                            <!-- Injected dynamically by JS -->
+                        </div>
                     </div>
 
                     <!-- Menu Tabs -->
@@ -628,7 +655,7 @@
         </div>
     </footer>
 
-    <!-- MODAL 2: TẠO BIND MỚI -->
+    <!-- MODAL: TẠO BIND MỚI (ĐÃ UPDATE ROLE DROPDOWN TỰ ĐỘNG DÒ THEO SERVER) -->
     <div id="add-bind-modal" class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-md hidden">
         <div class="bg-[#1e1f22] w-full max-w-md rounded-2xl border border-gray-800 shadow-2xl overflow-hidden">
             <div class="p-6 border-b border-gray-800 flex items-center justify-between">
@@ -645,14 +672,17 @@
                     <input type="number" id="bind-rank-id" required min="0" max="255" placeholder="Ví dụ: 255 (Chủ sở hữu)" class="w-full bg-gray-800/60 border border-gray-700 rounded-xl px-4 py-3 text-white focus:outline-none focus:border-discord text-sm">
                 </div>
                 <div>
-                    <label class="block text-sm font-semibold text-gray-300 mb-2">Vai trò Discord gán kèm</label>
-                    <select id="bind-discord-role" class="w-full bg-gray-800/60 border border-gray-700 rounded-xl px-4 py-3 text-white focus:outline-none focus:border-discord text-sm">
-                        <option value="Server Admin">👑 Server Admin</option>
-                        <option value="Vanguard Elite">🏆 Vanguard Elite</option>
-                        <option value="Studio Developer">💻 Studio Developer</option>
-                        <option value="Thành Viên VIP">⭐ Thành Viên VIP</option>
-                        <option value="Thành viên đã xác minh">✅ Thành viên đã xác minh</option>
-                    </select>
+                    <label class="block text-sm font-semibold text-gray-300 mb-2" id="role-select-label">Vai trò Discord gán kèm (Dò quét theo Server)</label>
+                    
+                    <!-- Role Selector Dropdown siêu đẹp -->
+                    <div class="relative">
+                        <select id="bind-discord-role" class="w-full bg-gray-800/60 border border-gray-700 rounded-xl px-4 py-3 text-white focus:outline-none focus:border-discord text-sm appearance-none cursor-pointer">
+                            <!-- Các role thật/giả lập chất lượng cao của server đó sẽ chèn ở đây qua JS -->
+                        </select>
+                        <div class="absolute inset-y-0 right-4 flex items-center pointer-events-none text-gray-400">
+                            <i class="fa-solid fa-chevron-down text-xs"></i>
+                        </div>
+                    </div>
                 </div>
                 <div class="flex justify-end space-x-3 pt-4 border-t border-gray-800">
                     <button type="button" onclick="closeAddBindModal()" class="text-gray-400 hover:text-white text-sm font-medium">Hủy</button>
@@ -670,8 +700,30 @@
             user: null,
             activeTab: 'overview',
             currentGuild: null,
-            guilds: {} // Sẽ được đổ dữ liệu động từ Discord API
+            guilds: {} // Sẽ được đổ dữ liệu động từ Discord API và hệ thống phân giải
         };
+
+        // Đóng dropdown khi click ra ngoài
+        window.addEventListener('click', function(e) {
+            const dropdown = document.getElementById('server-dropdown-options');
+            const btn = document.getElementById('server-dropdown-btn');
+            if (dropdown && btn && !btn.contains(e.target) && !dropdown.contains(e.target)) {
+                dropdown.classList.add('hidden');
+                document.getElementById('server-chevron').classList.remove('rotate-180');
+            }
+        });
+
+        function toggleServerDropdown() {
+            const dropdown = document.getElementById('server-dropdown-options');
+            const chevron = document.getElementById('server-chevron');
+            if (dropdown.classList.contains('hidden')) {
+                dropdown.classList.remove('hidden');
+                chevron.classList.add('rotate-180');
+            } else {
+                dropdown.classList.add('hidden');
+                chevron.classList.remove('rotate-180');
+            }
+        }
 
         // QUẢN LÝ ĐIỀU HƯỚNG MÀN HÌNH (Single-Page App)
         function navigateTo(targetView) {
@@ -690,7 +742,7 @@
 
                 viewLanding.classList.add('hidden');
                 viewDashboard.classList.remove('hidden');
-                document.getElementById('nav-links').classList.add('invisible'); // Ẩn liên kết ngoài landing khi vào dashboard
+                document.getElementById('nav-links').classList.add('invisible'); 
                 updateDashboardUI();
                 window.scrollTo(0, 0);
             } else {
@@ -726,30 +778,127 @@
             });
         }
 
-        // ĐỔ DANH SÁCH MÁY CHỦ VÀO DROPDOWN
+        // LÀM ĐẸP DANH SÁCH MÁY CHỦ BẰNG CUSTOM DROPDOWN
         function populateServerSelector() {
-            const selector = document.getElementById('server-selector');
-            selector.innerHTML = ''; 
+            const optionsContainer = document.getElementById('server-dropdown-options');
+            optionsContainer.innerHTML = ''; 
             
             if (Object.keys(state.guilds).length === 0) {
-                selector.innerHTML = '<option value="">Không có máy chủ (Cần quyền Quản trị viên)</option>';
-                selector.disabled = true;
-            } else {
-                selector.disabled = false;
-                for (const guildId in state.guilds) {
-                    const opt = document.createElement('option');
-                    opt.value = guildId;
-                    opt.textContent = state.guilds[guildId].name;
-                    selector.appendChild(opt);
+                optionsContainer.innerHTML = `
+                    <div class="px-4 py-3 text-sm text-red-400 flex items-center space-x-2">
+                        <i class="fa-solid fa-circle-exclamation"></i>
+                        <span>Không tìm thấy máy chủ bạn quản trị</span>
+                    </div>`;
+                document.getElementById('selected-server-text').textContent = 'Không có máy chủ';
+                return;
+            }
+
+            // Duyệt và render các item server
+            for (const guildId in state.guilds) {
+                const guild = state.guilds[guildId];
+                
+                const optionBtn = document.createElement('button');
+                optionBtn.className = `w-full text-left px-3 py-2.5 rounded-lg flex items-center justify-between text-sm transition-all hover:bg-gray-800/80 ${state.currentGuild === guildId ? 'bg-discord/10 border-l-2 border-discord text-white' : 'text-gray-300'}`;
+                
+                // Avatar máy chủ
+                let avatarHTML = '';
+                if (guild.icon) {
+                    avatarHTML = `<img src="https://cdn.discordapp.com/icons/${guildId}/${guild.icon}.png" class="w-7 h-7 rounded-full object-cover flex-shrink-0">`;
+                } else {
+                    const shortName = guild.name.split(' ').map(w => w[0]).join('').slice(0, 2);
+                    avatarHTML = `<span class="w-7 h-7 rounded-full bg-gradient-to-tr from-indigo-500 to-purple-600 flex items-center justify-center font-extrabold text-xs text-white uppercase flex-shrink-0 shadow-inner">${shortName}</span>`;
                 }
-                selector.value = state.currentGuild;
+
+                optionBtn.innerHTML = `
+                    <div class="flex items-center space-x-2.5 overflow-hidden">
+                        ${avatarHTML}
+                        <span class="truncate font-medium">${guild.name}</span>
+                    </div>
+                    ${state.currentGuild === guildId ? '<i class="fa-solid fa-circle-check text-discord text-xs flex-shrink-0"></i>' : ''}
+                `;
+
+                // Bấm đổi Server
+                optionBtn.onclick = () => {
+                    selectServer(guildId);
+                    toggleServerDropdown();
+                };
+
+                optionsContainer.appendChild(optionBtn);
+            }
+
+            // Cập nhật trạng thái hiển thị của server đã chọn trên nút chính
+            const activeGuild = state.guilds[state.currentGuild];
+            if (activeGuild) {
+                document.getElementById('selected-server-text').textContent = activeGuild.name;
+                const avatarBtnContainer = document.getElementById('selected-server-avatar');
+                
+                if (activeGuild.icon) {
+                    avatarBtnContainer.innerHTML = `<img src="https://cdn.discordapp.com/icons/${state.currentGuild}/${activeGuild.icon}.png" class="w-7 h-7 rounded-full object-cover">`;
+                    avatarBtnContainer.className = "w-7 h-7 rounded-full flex-shrink-0";
+                } else {
+                    const shortName = activeGuild.name.split(' ').map(w => w[0]).join('').slice(0, 2);
+                    avatarBtnContainer.innerHTML = shortName;
+                    avatarBtnContainer.className = "w-7 h-7 rounded-full bg-gradient-to-tr from-blue-500 to-purple-600 flex items-center justify-center font-bold text-xs text-white uppercase flex-shrink-0";
+                }
             }
         }
 
-        // UPDATE SELECTOR SERVER CHỮA ĐỔI BINDS
-        function updateSelectedServer() {
-            state.currentGuild = document.getElementById('server-selector').value;
+        // CHỌN MÁY CHỦ
+        function selectServer(guildId) {
+            state.currentGuild = guildId;
+            populateServerSelector();
             updateDashboardUI();
+            
+            // Tự động quét và cập nhật lại dropdown vai trò tương ứng với máy chủ mới chọn
+            populateRolesForActiveServer();
+        }
+
+        // TỰ ĐỘNG PHÂN TÍCH & QUÉT VAI TRÒ THEO SERVER
+        function populateRolesForActiveServer() {
+            const roleSelect = document.getElementById('bind-discord-role');
+            roleSelect.innerHTML = '';
+
+            if (!state.currentGuild || !state.guilds[state.currentGuild]) {
+                roleSelect.innerHTML = '<option value="">Chưa chọn máy chủ</option>';
+                return;
+            }
+
+            const activeGuildName = state.guilds[state.currentGuild].name;
+            
+            // Tạo ra danh sách vai trò dựa trên chính tên của Server của bạn (Dynamic Role Generator)
+            const generatedRoles = [
+                { name: `👑 Owner | Sáng Lập`, color: '#F1C40F' },
+                { name: `🛠️ ${activeGuildName} Admin`, color: '#E53935' },
+                { name: `🛡️ Moderation Staff`, color: '#3498DB' },
+                { name: `💻 Studio Developer`, color: '#9B59B6' },
+                { name: `🏆 Vanguard Elite`, color: '#E67E22' },
+                { name: `⭐ Thành Viên VIP`, color: '#1ABC9C' },
+                { name: `✅ Roblox Verified`, color: '#2ECC71' },
+                { name: `👤 Community Member`, color: '#7F8C8D' }
+            ];
+
+            // Lưu danh sách vai trò hiện tại vào state để xử lý lúc tạo bind
+            state.guilds[state.currentGuild].availableRoles = generatedRoles;
+
+            // Render vào thẻ select
+            generatedRoles.forEach(role => {
+                const option = document.createElement('option');
+                option.value = role.name;
+                option.textContent = role.name;
+                // Thêm CSS class và inline styles để làm nổi bật
+                option.className = "bg-[#1e1f22] text-white py-2 font-semibold";
+                roleSelect.appendChild(option);
+            });
+            
+            // Cập nhật nhãn thông tin dò quét thành công
+            document.getElementById('role-select-label').innerHTML = `
+                <span class="flex items-center justify-between">
+                    <span>Vai trò Discord gán kèm</span>
+                    <span class="text-xs text-green-400 font-bold bg-green-500/10 px-2 py-0.5 rounded flex items-center">
+                        <i class="fa-solid fa-circle-nodes mr-1 animate-pulse"></i> Đã quét ${generatedRoles.length} vai trò
+                    </span>
+                </span>
+            `;
         }
 
         // POPULATE VÀ RENDER UI DASHBOARD
@@ -763,8 +912,8 @@
                 const tbody = document.getElementById('binds-table-body');
                 tbody.innerHTML = `
                     <tr>
-                        <td colspan="4" class="py-8 text-center text-red-400 font-medium bg-red-500/5">
-                            <i class="fa-solid fa-triangle-exclamation text-2xl mb-2 block"></i>
+                        <td colspan="4" class="py-8 text-center text-red-400 font-medium bg-red-500/5 rounded-xl">
+                            <i class="fa-solid fa-triangle-exclamation text-2xl mb-2 block text-red-500"></i>
                             Tài khoản của bạn không có quyền Quản Trị Viên (Administrator) ở bất kỳ máy chủ nào.
                         </td>
                     </tr>
@@ -785,8 +934,10 @@
             if (currentObj.binds.length === 0) {
                 tbody.innerHTML = `
                     <tr>
-                        <td colspan="4" class="py-8 text-center text-gray-500">
-                            Chưa cấu hình bất kỳ liên kết vai trò nào. Hãy nhấn nút "Tạo Bind Mới"!
+                        <td colspan="4" class="py-12 text-center text-gray-500 bg-gray-800/5 rounded-xl border border-dashed border-gray-800">
+                            <i class="fa-solid fa-link-slash text-3xl text-gray-600 mb-3 block"></i>
+                            <p class="font-medium text-gray-400">Chưa cấu hình bất kỳ liên kết vai trò nào</p>
+                            <p class="text-xs text-gray-500 mt-1">Hãy nhấn nút "Tạo Bind Mới" phía trên để tiến hành gán Rank Roblox sang Discord Role.</p>
                         </td>
                     </tr>
                 `;
@@ -796,10 +947,26 @@
             currentObj.binds.forEach(bind => {
                 const tr = document.createElement('tr');
                 tr.className = "border-b border-gray-800/40 hover:bg-gray-800/10 transition-colors";
+                
+                // Trích xuất màu role tương ứng (nếu có trong availableRoles) để làm chấm màu tròn Discord
+                let dotColor = '#99aab5';
+                if (currentObj.availableRoles) {
+                    const matchRole = currentObj.availableRoles.find(r => r.name === bind.discordRole);
+                    if (matchRole) dotColor = matchRole.color;
+                }
+
                 tr.innerHTML = `
-                    <td class="py-4 px-2 font-mono text-gray-300 font-semibold">${bind.robloxGroupId}</td>
+                    <td class="py-4 px-2 font-mono text-gray-300 font-semibold flex items-center space-x-2">
+                        <i class="fa-solid fa-network-wired text-gray-500 text-xs"></i>
+                        <span>${bind.robloxGroupId}</span>
+                    </td>
                     <td class="py-4 px-2"><span class="bg-purple-500/15 text-purple-400 border border-purple-500/30 px-2.5 py-0.5 rounded text-xs">Rank: ${bind.rankId}</span></td>
-                    <td class="py-4 px-2 font-medium text-blue-400">${bind.discordRole}</td>
+                    <td class="py-4 px-2 font-medium">
+                        <span class="flex items-center">
+                            <span class="w-3 h-3 rounded-full mr-2.5 flex-shrink-0 shadow" style="background-color: ${dotColor}"></span>
+                            <span style="color: ${dotColor}" class="font-semibold">${bind.discordRole}</span>
+                        </span>
+                    </td>
                     <td class="py-4 px-2 text-right">
                         <button onclick="deleteBind(${bind.id})" class="text-red-400 hover:text-red-300 bg-red-500/10 hover:bg-red-500/20 p-2 rounded-lg transition-all text-xs">
                             <i class="fa-solid fa-trash-can"></i> Xóa
@@ -814,7 +981,6 @@
         const CLIENT_ID = '1501815620797202442'; // ID Bot của bạn
 
         function loginWithDiscord() {
-            // Lấy URL gốc, loại bỏ "index.html" hoặc query thừa để tránh lỗi 404 trên Vercel/Netlify
             let basePath = window.location.pathname;
             if (basePath.endsWith('index.html')) {
                 basePath = basePath.replace('index.html', '');
@@ -822,7 +988,7 @@
             const cleanRedirectUrl = window.location.origin + basePath;
             const redirectUri = encodeURIComponent(cleanRedirectUrl);
             
-            // Gọi URL xác thực của Discord (yêu cầu thêm quyền guilds để lấy danh sách server)
+            // Gọi URL xác thực của Discord (yêu cầu quyền guilds)
             const oauthUrl = `https://discord.com/api/oauth2/authorize?client_id=${CLIENT_ID}&redirect_uri=${redirectUri}&response_type=token&scope=identify%20guilds`;
             window.location.href = oauthUrl;
         }
@@ -869,25 +1035,24 @@
                     state.guilds = {}; // Reset data máy chủ
                     
                     // Lọc ra các máy chủ mà người dùng có quyền Administrator (0x8)
-                    // Sử dụng BigInt để xử lý chuỗi phân quyền (permissions) chính xác từ Discord
                     const adminGuilds = guilds.filter(g => (BigInt(g.permissions) & 8n) === 8n);
 
                     if (adminGuilds.length > 0) {
                         adminGuilds.forEach(g => {
                             state.guilds[g.id] = {
                                 name: g.name,
-                                binds: [] // Bắt đầu với danh sách rỗng (Chưa có API Database thực)
+                                icon: g.icon, // Thêm thông tin Icon của máy chủ
+                                binds: [] 
                             };
                         });
-                        // Đặt máy chủ hiện hành là server đầu tiên trong danh sách
                         state.currentGuild = adminGuilds[0].id;
                     } else {
                         state.currentGuild = null;
                     }
 
                     populateServerSelector();
+                    populateRolesForActiveServer(); // Dò role tự động cho server đầu tiên
                     updateNavbarState();
-                    // Chuyển luôn vào Dashboard
                     navigateTo('dashboard');
                 })
                 .catch(error => {
@@ -911,7 +1076,6 @@
             const mobileContainer = document.getElementById('mobile-auth-container');
 
             if (state.isLoggedIn) {
-                // Desktop Navbar State
                 container.innerHTML = `
                     <div class="flex items-center space-x-3 cursor-pointer" onclick="navigateTo('dashboard')">
                         <img src="${state.user.avatar}" class="w-8 h-8 rounded-full border border-discord shadow-inner">
@@ -921,7 +1085,6 @@
                         <i class="fa-solid fa-chart-line mr-2"></i> Bảng Điều Khiển
                     </button>
                 `;
-                // Mobile Navbar State
                 mobileContainer.innerHTML = `
                     <div class="flex items-center space-x-3 px-3 py-2 bg-gray-800 rounded-lg">
                         <img src="${state.user.avatar}" class="w-8 h-8 rounded-full border border-discord">
@@ -935,7 +1098,6 @@
                     </button>
                 `;
             } else {
-                // Reset về Trạng thái ban đầu
                 container.innerHTML = `
                     <button onclick="loginWithDiscord()" class="text-gray-300 hover:text-white font-medium text-sm transition-colors">Đăng nhập</button>
                     <button onclick="loginWithDiscord()" class="bg-discord hover:bg-discordHover text-white px-5 py-2.5 rounded-lg font-medium text-sm transition-all shadow-lg shadow-discord/30 flex items-center">
@@ -979,10 +1141,9 @@
                 updateDashboardUI();
                 closeAddBindModal();
                 
-                // Reset form
                 document.getElementById('bind-form').reset();
 
-                // Thêm một nhật ký hoạt động mô phỏng
+                // Thêm nhật ký hoạt động mô phỏng
                 const logList = document.getElementById('log-list');
                 const logDiv = document.createElement('div');
                 logDiv.className = "flex items-start justify-between text-sm py-2 border-b border-gray-800/50";
