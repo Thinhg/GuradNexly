@@ -1,0 +1,997 @@
+<!DOCTYPE html>
+<html lang="vi" class="scroll-smooth">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>GuardNexly - Trình Xác Minh Roblox-Discord Tối Thượng</title>
+    <!-- Tích hợp Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Tích hợp FontAwesome cho Icon -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <!-- Cấu hình Tailwind -->
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        discord: '#5865F2',
+                        discordHover: '#4752C4',
+                        roblox: '#E53935',
+                        brandBg: '#0B0F19',
+                        cardBg: 'rgba(30, 41, 59, 0.4)',
+                    },
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                    }
+                }
+            }
+        }
+    </script>
+    <!-- Custom CSS cho hiệu ứng và font -->
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap');
+        
+        body {
+            background-color: #0B0F19;
+            color: #F8FAFC;
+            overflow-x: hidden;
+        }
+
+        /* Hiệu ứng nền toả sáng */
+        .glow-bg-1 {
+            position: absolute;
+            width: 600px;
+            height: 600px;
+            background: radial-gradient(circle, rgba(88, 101, 242, 0.15) 0%, rgba(11, 15, 25, 0) 70%);
+            top: -200px;
+            left: -200px;
+            z-index: -1;
+            border-radius: 50%;
+        }
+
+        .glow-bg-2 {
+            position: absolute;
+            width: 700px;
+            height: 700px;
+            background: radial-gradient(circle, rgba(168, 85, 247, 0.12) 0%, rgba(11, 15, 25, 0) 70%);
+            bottom: 100px;
+            right: -250px;
+            z-index: -1;
+            border-radius: 50%;
+        }
+
+        /* Thanh điều hướng kính mờ */
+        .glass-nav {
+            background: rgba(11, 15, 25, 0.75);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+        }
+
+        /* Thẻ tính năng */
+        .feature-card {
+            background: rgba(30, 41, 59, 0.4);
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .feature-card:hover {
+            transform: translateY(-8px);
+            border-color: rgba(88, 101, 242, 0.5);
+            background: rgba(30, 41, 59, 0.7);
+            box-shadow: 0 15px 35px -10px rgba(88, 101, 242, 0.25);
+        }
+
+        .feature-icon-wrapper {
+            background: linear-gradient(135deg, rgba(88,101,242,0.2) 0%, rgba(168,85,247,0.2) 100%);
+            border: 1px solid rgba(88, 101, 242, 0.3);
+        }
+
+        /* Gradient Text */
+        .text-gradient {
+            background-clip: text;
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-image: linear-gradient(to right, #60A5FA, #A855F7);
+        }
+
+        /* Animation fadeIn */
+        @keyframes fadeUp {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        .animate-fade-up {
+            animation: fadeUp 0.8s ease-out forwards;
+        }
+
+        /* Glass Panel cho Dashboard */
+        .glass-panel {
+            background: rgba(17, 24, 39, 0.7);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+        }
+    </style>
+</head>
+<body class="antialiased font-sans">
+
+    <!-- Trang trí nền -->
+    <div class="glow-bg-1"></div>
+    <div class="glow-bg-2"></div>
+
+    <!-- Thanh Điều Hướng (Navbar) -->
+    <nav class="fixed w-full z-50 glass-nav transition-all duration-300" id="navbar">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex items-center justify-between h-20">
+                <!-- Logo -->
+                <div class="flex-shrink-0 flex items-center cursor-pointer" onclick="navigateTo('home')">
+                    <div class="w-10 h-10 rounded-xl bg-gradient-to-br from-blue-500 to-purple-600 flex items-center justify-center text-white font-bold text-xl mr-3 shadow-lg">
+                        <i class="fa-solid fa-shield-halved"></i>
+                    </div>
+                    <span class="font-bold text-2xl tracking-tight text-white">GuardNexly</span>
+                </div>
+                
+                <!-- Desktop Menu -->
+                <div class="hidden md:block" id="nav-links">
+                    <div class="ml-10 flex items-baseline space-x-8">
+                        <a href="#home" onclick="navigateTo('home')" class="hover:text-blue-400 text-gray-300 px-3 py-2 rounded-md text-sm font-medium transition-colors">Trang Chủ</a>
+                        <a href="#features" onclick="navigateTo('home')" class="hover:text-blue-400 text-gray-300 px-3 py-2 rounded-md text-sm font-medium transition-colors">Tính Năng</a>
+                        <a href="#stats" onclick="navigateTo('home')" class="hover:text-blue-400 text-gray-300 px-3 py-2 rounded-md text-sm font-medium transition-colors">Thống Kê</a>
+                        <a href="#" class="hover:text-blue-400 text-gray-300 px-3 py-2 rounded-md text-sm font-medium transition-colors">Tài Liệu</a>
+                    </div>
+                </div>
+
+                <!-- CTA Button / User State -->
+                <div class="hidden md:flex items-center space-x-4" id="auth-buttons-container">
+                    <!-- Sẽ cập nhật động qua JS (Chưa đăng nhập / Đã đăng nhập) -->
+                    <button onclick="loginWithDiscord()" class="text-gray-300 hover:text-white font-medium text-sm transition-colors">Đăng nhập</button>
+                    <button onclick="loginWithDiscord()" class="bg-discord hover:bg-discordHover text-white px-5 py-2.5 rounded-lg font-medium text-sm transition-all shadow-lg shadow-discord/30 flex items-center">
+                        <i class="fa-brands fa-discord mr-2"></i> Bảng Điều Khiển
+                    </button>
+                </div>
+
+                <!-- Mobile menu button -->
+                <div class="-mr-2 flex md:hidden">
+                    <button type="button" id="mobile-menu-btn" class="inline-flex items-center justify-center p-2 rounded-md text-gray-400 hover:text-white hover:bg-gray-800 focus:outline-none">
+                        <i class="fa-solid fa-bars text-2xl"></i>
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Mobile Menu (Ẩn mặc định) -->
+        <div class="md:hidden hidden bg-gray-900 border-b border-gray-800" id="mobile-menu">
+            <div class="px-2 pt-2 pb-3 space-y-1 sm:px-3">
+                <a href="#home" onclick="navigateTo('home')" class="hover:bg-gray-800 text-white block px-3 py-2 rounded-md text-base font-medium">Trang Chủ</a>
+                <a href="#features" onclick="navigateTo('home')" class="hover:bg-gray-800 text-gray-300 block px-3 py-2 rounded-md text-base font-medium">Tính Năng</a>
+                <a href="#stats" onclick="navigateTo('home')" class="hover:bg-gray-800 text-gray-300 block px-3 py-2 rounded-md text-base font-medium">Thống Kê</a>
+                <div class="mt-4 pt-4 border-t border-gray-800 flex flex-col space-y-3" id="mobile-auth-container">
+                    <button onclick="loginWithDiscord()" class="text-gray-300 hover:text-white font-medium px-3 py-2 block text-center">Đăng nhập</button>
+                    <button onclick="loginWithDiscord()" class="bg-discord text-white px-5 py-3 rounded-lg font-medium text-center">
+                        <i class="fa-brands fa-discord mr-2"></i> Bảng Điều Khiển
+                    </button>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- MAIN VIEW: Landing Page -->
+    <div id="view-landing" class="block">
+        <!-- Hero Section -->
+        <section class="pt-32 pb-20 lg:pt-48 lg:pb-32 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto flex flex-col items-center text-center relative">
+            <div class="inline-flex items-center px-4 py-2 rounded-full bg-blue-500/10 border border-blue-500/20 text-blue-400 font-medium text-sm mb-8 animate-fade-up" style="animation-delay: 0.1s;">
+                <span class="flex h-2 w-2 rounded-full bg-blue-500 mr-2 animate-pulse"></span>
+                GuardNexly v3.0 Đã Ra Mắt!
+            </div>
+            
+            <h1 class="text-5xl md:text-7xl font-extrabold tracking-tight mb-6 animate-fade-up" style="animation-delay: 0.2s;">
+                Kết Nối <span class="text-gradient">Roblox</span> & <span class="text-gradient">Discord</span><br class="hidden md:block" /> Của Bạn Cùng Nhau
+            </h1>
+            
+            <p class="mt-4 max-w-2xl text-lg md:text-xl text-gray-400 mb-10 animate-fade-up" style="animation-delay: 0.3s;">
+                GuardNexly là bot xác minh thế hệ 2 mang đến hệ thống Bind tùy chỉnh mạnh mẽ, đồng bộ vai trò tức thì, và các công cụ quản lý máy chủ tối tân nhất.
+            </p>
+            
+            <div class="flex flex-col sm:flex-row gap-4 w-full sm:w-auto animate-fade-up" style="animation-delay: 0.4s;">
+                <a href="https://discord.com/oauth2/authorize?client_id=1501815620797202442&permissions=8&integration_type=0&scope=bot" target="_blank" class="bg-discord hover:bg-discordHover text-white px-8 py-4 rounded-xl font-bold text-lg transition-all shadow-lg shadow-discord/30 flex items-center justify-center transform hover:-translate-y-1">
+                    <i class="fa-solid fa-robot mr-3"></i> Thêm Vào Discord
+                </a>
+                <a href="#features" class="bg-gray-800 hover:bg-gray-700 text-white border border-gray-700 hover:border-gray-600 px-8 py-4 rounded-xl font-bold text-lg transition-all flex items-center justify-center transform hover:-translate-y-1">
+                    Khám Phá Tính Năng
+                </a>
+            </div>
+            
+            <!-- Dashboard Mockup Image -->
+            <div class="mt-20 w-full max-w-5xl relative animate-fade-up cursor-pointer" onclick="loginWithDiscord()" style="animation-delay: 0.6s;">
+                <div class="absolute inset-0 bg-gradient-to-t from-brandBg via-transparent to-transparent z-10"></div>
+                <div class="rounded-2xl border border-gray-800 bg-gray-900/50 p-2 shadow-2xl overflow-hidden backdrop-blur-sm transition-all hover:border-blue-500/30">
+                    <div class="bg-gray-800 h-8 flex items-center justify-between px-4 rounded-t-lg">
+                        <div class="flex space-x-2">
+                            <div class="w-3 h-3 rounded-full bg-red-500"></div>
+                            <div class="w-3 h-3 rounded-full bg-yellow-500"></div>
+                            <div class="w-3 h-3 rounded-full bg-green-500"></div>
+                        </div>
+                        <span class="text-xs text-gray-500 font-medium">dashboard.guardnexly.com</span>
+                        <div class="w-10"></div>
+                    </div>
+                    <div class="p-6 bg-[#121624] rounded-b-lg border border-t-0 border-gray-800/50 flex flex-col space-y-4 text-left">
+                        <div class="flex items-center justify-between border-b border-gray-800 pb-4">
+                            <div class="flex items-center space-x-3">
+                                <div class="w-10 h-10 rounded-xl bg-gradient-to-tr from-blue-600 to-purple-500 flex items-center justify-center text-white"><i class="fa-solid fa-gears"></i></div>
+                                <div>
+                                    <h4 class="font-bold text-white text-sm">NexlyDev's Development Server</h4>
+                                    <p class="text-xs text-gray-400">ID: 885912495012395021</p>
+                                </div>
+                            </div>
+                            <span class="bg-green-500/20 text-green-400 text-xs px-2.5 py-1 rounded-full border border-green-500/30">Hệ thống đang chạy</span>
+                        </div>
+                        <div class="grid grid-cols-1 md:grid-cols-3 gap-4 py-2">
+                            <div class="bg-gray-800/40 p-4 rounded-xl border border-gray-700/50">
+                                <p class="text-xs text-gray-400">Tổng liên kết vai trò (Binds)</p>
+                                <p class="text-2xl font-bold text-white mt-1">12 Binds</p>
+                            </div>
+                            <div class="bg-gray-800/40 p-4 rounded-xl border border-gray-700/50">
+                                <p class="text-xs text-gray-400">Tổng số thành viên xác minh</p>
+                                <p class="text-2xl font-bold text-blue-400 mt-1">1,482 Users</p>
+                            </div>
+                            <div class="bg-gray-800/40 p-4 rounded-xl border border-gray-700/50">
+                                <p class="text-xs text-gray-400">Xác minh tự động</p>
+                                <p class="text-2xl font-bold text-green-400 mt-1">Đang bật</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Stats Section -->
+        <section id="stats" class="py-12 border-y border-gray-800 bg-gray-900/30">
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                <div class="grid grid-cols-2 md:grid-cols-4 gap-8 text-center">
+                    <div>
+                        <div class="text-3xl md:text-4xl font-extrabold text-white mb-2">250K+</div>
+                        <div class="text-gray-400 text-sm font-medium uppercase tracking-wider">Máy Chủ</div>
+                    </div>
+                    <div>
+                        <div class="text-3xl md:text-4xl font-extrabold text-white mb-2">15M+</div>
+                        <div class="text-gray-400 text-sm font-medium uppercase tracking-wider">Người Dùng</div>
+                    </div>
+                    <div>
+                        <div class="text-3xl md:text-4xl font-extrabold text-white mb-2">99.99%</div>
+                        <div class="text-gray-400 text-sm font-medium uppercase tracking-wider">Uptime</div>
+                    </div>
+                    <div>
+                        <div class="text-3xl md:text-4xl font-extrabold text-white mb-2">Rust</div>
+                        <div class="text-gray-400 text-sm font-medium uppercase tracking-wider">Code Base</div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Features Section -->
+        <section id="features" class="py-24 relative">
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                <div class="text-center max-w-3xl mx-auto mb-16">
+                    <h2 class="text-blue-500 font-semibold tracking-wide uppercase text-sm mb-3">Sức Mạch Vượt Trội</h2>
+                    <p class="mt-2 text-3xl leading-8 font-extrabold tracking-tight text-white sm:text-4xl">
+                        Mọi thứ bạn cần để quản lý cộng đồng
+                    </p>
+                    <p class="mt-4 max-w-2xl text-lg text-gray-400 mx-auto">
+                        GuardNexly không chỉ là bot xác minh. Đó là một công cụ mạnh mẽ với tính linh hoạt cao giúp tự động hóa quá trình quản lý vai trò trong máy chủ.
+                    </p>
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+                    <!-- Card 1 -->
+                    <div class="feature-card rounded-2xl p-8">
+                        <div class="feature-icon-wrapper w-14 h-14 rounded-xl flex items-center justify-center text-blue-400 text-2xl mb-6 shadow-inner">
+                            <i class="fa-solid fa-link"></i>
+                        </div>
+                        <h3 class="text-xl font-bold text-white mb-3">Hệ thống Bind Tùy Chỉnh</h3>
+                        <p class="text-gray-400 leading-relaxed">
+                            Cung cấp hệ thống kết nối phức tạp: Group Binds, Rank Binds, Item Binds (Gamepass/Badge). Hỗ trợ logic nâng cao với các phép so sánh (>, >=, <, <=).
+                        </p>
+                    </div>
+
+                    <!-- Card 2 -->
+                    <div class="feature-card rounded-2xl p-8">
+                        <div class="feature-icon-wrapper w-14 h-14 rounded-xl flex items-center justify-center text-purple-400 text-2xl mb-6 shadow-inner">
+                            <i class="fa-solid fa-bolt"></i>
+                        </div>
+                        <h3 class="text-xl font-bold text-white mb-3">Tự Động Cập Nhật</h3>
+                        <p class="text-gray-400 leading-relaxed">
+                            Không cần gõ lệnh liên tục. GuardNexly sử dụng Auto-Update để đảm bảo roles của người dùng luôn được đồng bộ hóa với trạng thái Roblox hiện tại.
+                        </p>
+                    </div>
+
+                    <!-- Card 3 -->
+                    <div class="feature-card rounded-2xl p-8">
+                        <div class="feature-icon-wrapper w-14 h-14 rounded-xl flex items-center justify-center text-green-400 text-2xl mb-6 shadow-inner">
+                            <i class="fa-solid fa-database"></i>
+                        </div>
+                        <h3 class="text-xl font-bold text-white mb-3">Sao Lưu Dữ Liệu</h3>
+                        <p class="text-gray-400 leading-relaxed">
+                            Đừng lo lắng về việc mất cấu hình. Hệ thống Backup của chúng tôi cho phép bạn lưu trữ các binds và khôi phục chúng dễ dàng hoặc chuyển sang server khác (Templates).
+                        </p>
+                    </div>
+
+                    <!-- Card 4 -->
+                    <div class="feature-card rounded-2xl p-8">
+                        <div class="feature-icon-wrapper w-14 h-14 rounded-xl flex items-center justify-center text-red-400 text-2xl mb-6 shadow-inner">
+                            <i class="fa-solid fa-ban"></i>
+                        </div>
+                        <h3 class="text-xl font-bold text-white mb-3">Denylists & Bảo Mật</h3>
+                        <p class="text-gray-400 leading-relaxed">
+                            Bảo vệ server của bạn khỏi người dùng độc hại. Tính năng Denylists mạnh mẽ giúp tự động kick hoặc ban những tài khoản thuộc danh sách đen.
+                        </p>
+                    </div>
+
+                    <!-- Card 5 -->
+                    <div class="feature-card rounded-2xl p-8">
+                        <div class="feature-icon-wrapper w-14 h-14 rounded-xl flex items-center justify-center text-yellow-400 text-2xl mb-6 shadow-inner">
+                            <i class="fa-solid fa-key"></i>
+                        </div>
+                        <h3 class="text-xl font-bold text-white mb-3">Tích Hợp Open Cloud</h3>
+                        <p class="text-gray-400 leading-relaxed">
+                            Hỗ trợ API Token Open Cloud mới nhất của Roblox, giúp các tác vụ thực thi nhanh chóng, an toàn tuyệt đối mà không cần sử dụng bot tài khoản phụ (cookies).
+                        </p>
+                    </div>
+
+                    <!-- Card 6 -->
+                    <div class="feature-card rounded-2xl p-8">
+                        <div class="feature-icon-wrapper w-14 h-14 rounded-xl flex items-center justify-center text-teal-400 text-2xl mb-6 shadow-inner">
+                            <i class="fa-solid fa-microchip"></i>
+                        </div>
+                        <h3 class="text-xl font-bold text-white mb-3">Viết bằng Rust</h3>
+                        <p class="text-gray-400 leading-relaxed">
+                            Giống như RoWifi thế hệ 2, GuardNexly được lập trình 100% bằng Rust mang lại tốc độ thực thi siêu việt, tiêu thụ ít tài nguyên và ổn định 24/7.
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- CTA Section -->
+        <section class="py-20 relative overflow-hidden">
+            <div class="absolute inset-0 bg-gradient-to-r from-blue-900/20 to-purple-900/20"></div>
+            <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10 text-center">
+                <h2 class="text-3xl md:text-4xl font-bold text-white mb-6">Sẵn sàng để nâng cấp Server của bạn?</h2>
+                <p class="text-xl text-gray-300 mb-10">
+                    Gia nhập cùng hàng ngàn cộng đồng Roblox lớn đã tin tưởng sử dụng hệ thống của GuardNexly. Thiết lập chỉ trong chưa đầy 3 phút.
+                </p>
+                <a href="https://discord.com/oauth2/authorize?client_id=1501815620797202442&permissions=8&integration_type=0&scope=bot" target="_blank" class="inline-flex items-center justify-center px-8 py-4 text-base font-bold rounded-xl text-white bg-discord hover:bg-discordHover shadow-[0_0_20px_rgba(88,101,242,0.4)] transition-all transform hover:scale-105">
+                    <i class="fa-solid fa-plus mr-2"></i> Mời Bot Ngay
+                </a>
+            </div>
+        </section>
+    </div>
+
+    <!-- MAIN VIEW: Dashboard (Ẩn mặc định) -->
+    <div id="view-dashboard" class="hidden min-h-screen pt-24 pb-16 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto">
+        <div class="grid grid-cols-1 lg:grid-cols-4 gap-8">
+            <!-- Sidebar Panel -->
+            <div class="lg:col-span-1">
+                <div class="glass-panel rounded-2xl p-6 flex flex-col space-y-6">
+                    <!-- User Avatar & Tag -->
+                    <div class="flex items-center space-x-3 border-b border-gray-800 pb-5">
+                        <img id="dash-user-avatar" src="" alt="Avatar" class="w-12 h-12 rounded-full border-2 border-discord">
+                        <div>
+                            <h4 id="dash-user-name" class="font-bold text-white text-base">NexlyDev</h4>
+                            <p class="text-xs text-gray-400">Tài khoản xác minh</p>
+                        </div>
+                    </div>
+
+                    <!-- Server Select Selector -->
+                    <div>
+                        <label class="block text-xs font-bold uppercase tracking-wider text-gray-400 mb-2">Chọn máy chủ</label>
+                        <select id="server-selector" onchange="updateSelectedServer()" class="w-full bg-gray-800/80 border border-gray-700 rounded-xl px-4 py-3 text-white focus:outline-none focus:border-discord text-sm">
+                            <option value="guild_1">Nexly Roblox Hub (Chính)</option>
+                            <option value="guild_2">Vanguard Esports VN</option>
+                            <option value="guild_3">Roblox Vietnam Studio</option>
+                        </select>
+                    </div>
+
+                    <!-- Menu Tabs -->
+                    <div class="flex flex-col space-y-1">
+                        <button onclick="switchTab('overview')" id="tab-btn-overview" class="flex items-center space-x-3 px-4 py-3 rounded-xl font-medium text-sm text-left transition-all bg-discord/20 text-blue-400 border-l-4 border-discord">
+                            <i class="fa-solid fa-chart-simple w-5"></i> <span>Tổng Quan</span>
+                        </button>
+                        <button onclick="switchTab('binds')" id="tab-btn-binds" class="flex items-center space-x-3 px-4 py-3 rounded-xl font-medium text-sm text-left transition-all text-gray-400 hover:text-white hover:bg-gray-800/50">
+                            <i class="fa-solid fa-link w-5"></i> <span>Quản lý Binds</span>
+                        </button>
+                        <button onclick="switchTab('settings')" id="tab-btn-settings" class="flex items-center space-x-3 px-4 py-3 rounded-xl font-medium text-sm text-left transition-all text-gray-400 hover:text-white hover:bg-gray-800/50">
+                            <i class="fa-solid fa-sliders w-5"></i> <span>Cài Đặt Máy Chủ</span>
+                        </button>
+                    </div>
+
+                    <!-- Logout Button -->
+                    <button onclick="logout()" class="w-full bg-red-500/10 hover:bg-red-500/20 text-red-400 border border-red-500/20 py-3 rounded-xl font-medium text-sm transition-all flex items-center justify-center space-x-2">
+                        <i class="fa-solid fa-right-from-bracket"></i> <span>Đăng Xuất</span>
+                    </button>
+                </div>
+            </div>
+
+            <!-- Content Panel -->
+            <div class="lg:col-span-3">
+                <div class="glass-panel rounded-2xl p-8" id="dashboard-content-container">
+                    
+                    <!-- TAB 1: OVERVIEW -->
+                    <div id="tab-content-overview" class="block space-y-8">
+                        <div class="flex flex-col md:flex-row md:items-center justify-between gap-4">
+                            <div>
+                                <h2 class="text-3xl font-extrabold text-white" id="active-guild-title">Nexly Roblox Hub</h2>
+                                <p class="text-sm text-gray-400">Quản lý các kết nối vai trò, bảo mật và thiết lập máy chủ.</p>
+                            </div>
+                            <div class="flex space-x-2">
+                                <a href="https://discord.com/oauth2/authorize?client_id=1501815620797202442&permissions=8&integration_type=0&scope=bot" target="_blank" class="bg-discord hover:bg-discordHover text-white px-4 py-2.5 rounded-xl text-sm font-semibold flex items-center transition-all">
+                                    <i class="fa-solid fa-plus mr-2"></i> Mời/Đồng bộ bot
+                                </a>
+                            </div>
+                        </div>
+
+                        <!-- Info Cards -->
+                        <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                            <div class="bg-gray-800/20 border border-gray-800 p-6 rounded-2xl">
+                                <span class="text-gray-400 text-xs font-semibold uppercase">Tổng liên kết</span>
+                                <h3 class="text-3xl font-bold text-white mt-1" id="overview-binds-count">3 Binds</h3>
+                                <p class="text-xs text-blue-400 mt-2"><i class="fa-solid fa-arrow-trend-up"></i> Hoạt động tốt</p>
+                            </div>
+                            <div class="bg-gray-800/20 border border-gray-800 p-6 rounded-2xl">
+                                <span class="text-gray-400 text-xs font-semibold uppercase">Yêu cầu xác minh</span>
+                                <h3 class="text-3xl font-bold text-blue-400 mt-1">456</h3>
+                                <p class="text-xs text-gray-500 mt-2">Trong vòng 24 giờ qua</p>
+                            </div>
+                            <div class="bg-gray-800/20 border border-gray-800 p-6 rounded-2xl">
+                                <span class="text-gray-400 text-xs font-semibold uppercase">Trạng thái API Roblox</span>
+                                <h3 class="text-3xl font-bold text-green-400 mt-1">Ổn định</h3>
+                                <p class="text-xs text-green-500 mt-2"><i class="fa-solid fa-check"></i> Phản hồi 45ms</p>
+                            </div>
+                        </div>
+
+                        <!-- System Status Overview -->
+                        <div class="border border-gray-800 bg-gray-900/40 rounded-2xl p-6">
+                            <h3 class="font-bold text-white text-lg mb-4">Nhật ký hoạt động gần đây của GuardNexly</h3>
+                            <div class="space-y-3" id="log-list">
+                                <div class="flex items-start justify-between text-sm py-2 border-b border-gray-800/50">
+                                    <div class="flex items-center space-x-3">
+                                        <div class="w-2 h-2 rounded-full bg-green-500"></div>
+                                        <span class="text-gray-300">Thành viên <strong>HuyGamer#2023</strong> đã xác minh tài khoản Roblox <strong>HuyRoblox_Pro</strong></span>
+                                    </div>
+                                    <span class="text-xs text-gray-500">Vừa xong</span>
+                                </div>
+                                <div class="flex items-start justify-between text-sm py-2 border-b border-gray-800/50">
+                                    <div class="flex items-center space-x-3">
+                                        <div class="w-2 h-2 rounded-full bg-green-500"></div>
+                                        <span class="text-gray-300">Đồng bộ vai trò thành công cho 12 người dùng thuộc Group Roblox ID <strong>32591024</strong></span>
+                                    </div>
+                                    <span class="text-xs text-gray-500">10 phút trước</span>
+                                </div>
+                                <div class="flex items-start justify-between text-sm py-2">
+                                    <div class="flex items-center space-x-3">
+                                        <div class="w-2 h-2 rounded-full bg-blue-500"></div>
+                                        <span class="text-gray-300">Cập nhật cấu hình Group Binds bởi <strong>NexlyDev</strong></span>
+                                    </div>
+                                    <span class="text-xs text-gray-500">30 phút trước</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- TAB 2: BINDS MANAGEMENT -->
+                    <div id="tab-content-binds" class="hidden space-y-8">
+                        <div class="flex items-center justify-between border-b border-gray-800 pb-5">
+                            <div>
+                                <h2 class="text-2xl font-bold text-white">Quản lý Binds (Liên Kết Vai Trò)</h2>
+                                <p class="text-sm text-gray-400">Ánh xạ trực tiếp thứ hạng nhóm Roblox sang vai trò tương ứng trong Discord.</p>
+                            </div>
+                            <button onclick="openAddBindModal()" class="bg-blue-600 hover:bg-blue-500 text-white px-4 py-2.5 rounded-xl text-sm font-semibold flex items-center transition-all">
+                                <i class="fa-solid fa-plus mr-2"></i> Tạo Bind Mới
+                            </button>
+                        </div>
+
+                        <!-- Bindings List Table -->
+                        <div class="overflow-x-auto">
+                            <table class="w-full text-left border-collapse">
+                                <thead>
+                                    <tr class="border-b border-gray-800 text-gray-400 text-xs font-bold uppercase">
+                                        <th class="py-4 px-2">Roblox Group ID</th>
+                                        <th class="py-4 px-2">Thứ hạng / Rank ID</th>
+                                        <th class="py-4 px-2">Discord Role</th>
+                                        <th class="py-4 px-2 text-right">Hành động</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="binds-table-body" class="divide-y divide-gray-800/60 text-sm">
+                                    <!-- Sẽ render qua JS -->
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+
+                    <!-- TAB 3: SETTINGS -->
+                    <div id="tab-content-settings" class="hidden space-y-8">
+                        <div class="border-b border-gray-800 pb-5">
+                            <h2 class="text-2xl font-bold text-white">Cài Đặt Máy Chủ</h2>
+                            <p class="text-sm text-gray-400">Tinh chỉnh các thiết lập hệ thống tự động hóa của GuardNexly.</p>
+                        </div>
+
+                        <form id="settings-form" class="space-y-6" onsubmit="saveSettings(event)">
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                                <div>
+                                    <label class="block text-sm font-semibold text-gray-300 mb-2">Tên hiển thị phụ (Prefix)</label>
+                                    <input type="text" id="bot-prefix" value="g!" class="w-full bg-gray-800/60 border border-gray-700 rounded-xl px-4 py-3 text-white focus:outline-none focus:border-discord text-sm">
+                                </div>
+                                <div>
+                                    <label class="block text-sm font-semibold text-gray-300 mb-2">Đồng bộ Nickname Roblox</label>
+                                    <select id="sync-nickname" class="w-full bg-gray-800/60 border border-gray-700 rounded-xl px-4 py-3 text-white focus:outline-none focus:border-discord text-sm">
+                                        <option value="true">Bật (Thay đổi biệt danh Discord theo tên Roblox)</option>
+                                        <option value="false">Tắt (Giữ nguyên biệt danh ban đầu)</option>
+                                    </select>
+                                </div>
+                            </div>
+
+                            <div class="space-y-4">
+                                <h3 class="text-lg font-bold text-white border-t border-gray-800 pt-6">Tính Năng Tự Động Hóa</h3>
+                                <div class="flex items-center justify-between p-4 bg-gray-800/20 border border-gray-800/50 rounded-xl">
+                                    <div>
+                                        <h4 class="font-bold text-white text-sm">Tự động kích khi bị Roblox Ban (Deny-Ban)</h4>
+                                        <p class="text-xs text-gray-400">Tự động kích hoạt hành động đối phó khi phát hiện người dùng bị khóa tài khoản Roblox chính chủ.</p>
+                                    </div>
+                                    <label class="relative inline-flex items-center cursor-pointer">
+                                        <input type="checkbox" id="auto-ban-toggle" class="sr-only peer" checked>
+                                        <div class="w-11 h-6 bg-gray-700 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-blue-600"></div>
+                                    </label>
+                                </div>
+                                <div class="flex items-center justify-between p-4 bg-gray-800/20 border border-gray-800/50 rounded-xl">
+                                    <div>
+                                        <h4 class="font-bold text-white text-sm">Xác minh định kỳ (Auto-Update-Interval)</h4>
+                                        <p class="text-xs text-gray-400">Cho phép bot chạy quét tự động định kỳ 12h một lần nhằm cập nhật phân quyền người dùng.</p>
+                                    </div>
+                                    <label class="relative inline-flex items-center cursor-pointer">
+                                        <input type="checkbox" id="auto-scan-toggle" class="sr-only peer" checked>
+                                        <div class="w-11 h-6 bg-gray-700 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-blue-600"></div>
+                                    </label>
+                                </div>
+                            </div>
+
+                            <!-- Notification Message -->
+                            <div id="settings-status-message" class="hidden p-4 rounded-xl text-sm"></div>
+
+                            <div class="flex justify-end pt-4">
+                                <button type="submit" class="bg-blue-600 hover:bg-blue-500 text-white px-6 py-3 rounded-xl font-bold text-sm transition-all shadow-lg shadow-blue-500/20">
+                                    <i class="fa-solid fa-floppy-disk mr-2"></i> Lưu Cấu Hình
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Footer -->
+    <footer class="bg-[#070a11] border-t border-gray-800 pt-16 pb-8">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="grid grid-cols-1 md:grid-cols-4 gap-12 mb-12">
+                <div class="col-span-1 md:col-span-1">
+                    <div class="flex items-center mb-4">
+                        <div class="w-8 h-8 rounded-lg bg-gradient-to-br from-blue-500 to-purple-600 flex items-center justify-center text-white font-bold text-sm mr-2">
+                            <i class="fa-solid fa-shield-halved"></i>
+                        </div>
+                        <span class="font-bold text-xl text-white">GuardNexly</span>
+                    </div>
+                    <p class="text-gray-400 text-sm mb-6">
+                        Trình xác minh Discord - Roblox mạnh mẽ, tùy biến cao và ổn định nhất.
+                    </p>
+                    <div class="flex space-x-4">
+                        <a href="https://discord.com/oauth2/authorize?client_id=1501815620797202442&permissions=8&integration_type=0&scope=bot" target="_blank" class="text-gray-400 hover:text-white transition-colors"><i class="fa-brands fa-discord text-xl"></i></a>
+                        <a href="#" class="text-gray-400 hover:text-white transition-colors"><i class="fa-brands fa-twitter text-xl"></i></a>
+                        <a href="#" class="text-gray-400 hover:text-white transition-colors"><i class="fa-brands fa-github text-xl"></i></a>
+                    </div>
+                </div>
+                
+                <div>
+                    <h4 class="text-white font-bold mb-4 uppercase text-sm tracking-wider">Sản Phẩm</h4>
+                    <ul class="space-y-2 text-sm">
+                        <li><a href="#" class="text-gray-400 hover:text-blue-400 transition-colors">Tính năng</a></li>
+                        <li><a href="#" class="text-gray-400 hover:text-blue-400 transition-colors">GuardNexly Premium</a></li>
+                        <li><a href="#" class="text-gray-400 hover:text-blue-400 transition-colors">Trạng thái (Status)</a></li>
+                    </ul>
+                </div>
+
+                <div>
+                    <h4 class="text-white font-bold mb-4 uppercase text-sm tracking-wider">Tài Nguyên</h4>
+                    <ul class="space-y-2 text-sm">
+                        <li><a href="#" class="text-gray-400 hover:text-blue-400 transition-colors">Tài liệu API (Docs)</a></li>
+                        <li><a href="#" class="text-gray-400 hover:text-blue-400 transition-colors">Lệnh (Commands)</a></li>
+                        <li><a href="#" class="text-gray-400 hover:text-blue-400 transition-colors">Hỗ trợ / Support Server</a></li>
+                    </ul>
+                </div>
+
+                <div>
+                    <h4 class="text-white font-bold mb-4 uppercase text-sm tracking-wider">Pháp Lý</h4>
+                    <ul class="space-y-2 text-sm">
+                        <li><a href="#" class="text-gray-400 hover:text-blue-400 transition-colors">Điều khoản dịch vụ</a></li>
+                        <li><a href="#" class="text-gray-400 hover:text-blue-400 transition-colors">Chính sách bảo mật</a></li>
+                        <li><a href="#" class="text-gray-400 hover:text-blue-400 transition-colors">Chính sách hoàn tiền</a></li>
+                    </ul>
+                </div>
+            </div>
+            <div class="border-t border-gray-800 pt-8 flex flex-col md:flex-row justify-between items-center">
+                <p class="text-gray-500 text-sm">
+                    &copy; 2026 GuardNexly. Không được liên kết với Roblox Corporation hay Discord Inc.
+                </p>
+                <div class="mt-4 md:mt-0 flex items-center">
+                    <span class="flex h-2 w-2 rounded-full bg-green-500 mr-2"></span>
+                    <span class="text-sm text-gray-400">Tất cả các hệ thống hoạt động bình thường</span>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <!-- MODAL 2: TẠO BIND MỚI -->
+    <div id="add-bind-modal" class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-md hidden">
+        <div class="bg-[#1e1f22] w-full max-w-md rounded-2xl border border-gray-800 shadow-2xl overflow-hidden">
+            <div class="p-6 border-b border-gray-800 flex items-center justify-between">
+                <h3 class="text-lg font-bold text-white">Tạo Liên Kết Vai Trò Mới</h3>
+                <button onclick="closeAddBindModal()" class="text-gray-400 hover:text-white"><i class="fa-solid fa-xmark"></i></button>
+            </div>
+            <form id="bind-form" onsubmit="createNewBind(event)" class="p-6 space-y-4">
+                <div>
+                    <label class="block text-sm font-semibold text-gray-300 mb-2">Roblox Group ID</label>
+                    <input type="text" id="bind-group-id" required placeholder="Nhập ID Nhóm ví dụ: 32591024" class="w-full bg-gray-800/60 border border-gray-700 rounded-xl px-4 py-3 text-white focus:outline-none focus:border-discord text-sm">
+                </div>
+                <div>
+                    <label class="block text-sm font-semibold text-gray-300 mb-2">Rank ID (0-255)</label>
+                    <input type="number" id="bind-rank-id" required min="0" max="255" placeholder="Ví dụ: 255 (Chủ sở hữu)" class="w-full bg-gray-800/60 border border-gray-700 rounded-xl px-4 py-3 text-white focus:outline-none focus:border-discord text-sm">
+                </div>
+                <div>
+                    <label class="block text-sm font-semibold text-gray-300 mb-2">Vai trò Discord gán kèm</label>
+                    <select id="bind-discord-role" class="w-full bg-gray-800/60 border border-gray-700 rounded-xl px-4 py-3 text-white focus:outline-none focus:border-discord text-sm">
+                        <option value="Server Admin">👑 Server Admin</option>
+                        <option value="Vanguard Elite">🏆 Vanguard Elite</option>
+                        <option value="Studio Developer">💻 Studio Developer</option>
+                        <option value="Thành Viên VIP">⭐ Thành Viên VIP</option>
+                        <option value="Thành viên đã xác minh">✅ Thành viên đã xác minh</option>
+                    </select>
+                </div>
+                <div class="flex justify-end space-x-3 pt-4 border-t border-gray-800">
+                    <button type="button" onclick="closeAddBindModal()" class="text-gray-400 hover:text-white text-sm font-medium">Hủy</button>
+                    <button type="submit" class="bg-blue-600 hover:bg-blue-500 text-white px-5 py-2.5 rounded-xl text-sm font-semibold transition-all">Tạo Mới</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Scripts -->
+    <script>
+        // TRẠNG THÁI TOÀN CỤC CỦA HỆ THỐNG
+        let state = {
+            isLoggedIn: false,
+            user: null,
+            activeTab: 'overview',
+            currentGuild: 'guild_1',
+            guilds: {
+                guild_1: {
+                    name: "Nexly Roblox Hub",
+                    binds: [
+                        { id: 1, robloxGroupId: "32591024", rankId: "255", discordRole: "👑 Server Admin" },
+                        { id: 2, robloxGroupId: "32591024", rankId: "250", discordRole: "💻 Studio Developer" },
+                        { id: 3, robloxGroupId: "11405102", rankId: "1-100", discordRole: "⭐ Thành Viên VIP" }
+                    ]
+                },
+                guild_2: {
+                    name: "Vanguard Esports VN",
+                    binds: [
+                        { id: 4, robloxGroupId: "99823451", rankId: "120", discordRole: "🏆 Vanguard Elite" }
+                    ]
+                },
+                guild_3: {
+                    name: "Roblox Vietnam Studio",
+                    binds: [
+                        { id: 5, robloxGroupId: "44501259", rankId: "0-255", discordRole: "✅ Thành viên đã xác minh" }
+                    ]
+                }
+            }
+        };
+
+        // QUẢN LÝ ĐIỀU HƯỚNG MÀN HÌNH (Single-Page App)
+        function navigateTo(targetView) {
+            const viewLanding = document.getElementById('view-landing');
+            const viewDashboard = document.getElementById('view-dashboard');
+
+            if (targetView === 'dashboard') {
+                if (!state.isLoggedIn) {
+                    loginWithDiscord();
+                    return;
+                }
+                
+                // Cập nhật thông tin avatar thật lên sidebar dashboard
+                document.getElementById('dash-user-avatar').src = state.user.avatar;
+                document.getElementById('dash-user-name').textContent = state.user.displayTag;
+
+                viewLanding.classList.add('hidden');
+                viewDashboard.classList.remove('hidden');
+                document.getElementById('nav-links').classList.add('invisible'); // Ẩn liên kết ngoài landing khi vào dashboard
+                updateDashboardUI();
+                window.scrollTo(0, 0);
+            } else {
+                // Quay lại Landing Page
+                viewLanding.classList.remove('hidden');
+                viewDashboard.classList.add('hidden');
+                document.getElementById('nav-links').classList.remove('invisible');
+                window.scrollTo(0, 0);
+            }
+        }
+
+        // TABS SWITCHER TRONG DASHBOARD
+        function switchTab(tabName) {
+            state.activeTab = tabName;
+            
+            // Ẩn tất cả tab-contents
+            document.getElementById('tab-content-overview').classList.add('hidden');
+            document.getElementById('tab-content-binds').classList.add('hidden');
+            document.getElementById('tab-content-settings').classList.add('hidden');
+
+            // Hiển thị tab đang chọn
+            document.getElementById(`tab-content-${tabName}`).classList.remove('hidden');
+
+            // Cập nhật phong cách cho sidebar button
+            const tabs = ['overview', 'binds', 'settings'];
+            tabs.forEach(tab => {
+                const btn = document.getElementById(`tab-btn-${tab}`);
+                if (tab === tabName) {
+                    btn.className = "flex items-center space-x-3 px-4 py-3 rounded-xl font-medium text-sm text-left transition-all bg-discord/20 text-blue-400 border-l-4 border-discord";
+                } else {
+                    btn.className = "flex items-center space-x-3 px-4 py-3 rounded-xl font-medium text-sm text-left transition-all text-gray-400 hover:text-white hover:bg-gray-800/50";
+                }
+            });
+        }
+
+        // UPDATE SELECTOR SERVER CHỮA ĐỔI BINDS
+        function updateSelectedServer() {
+            state.currentGuild = document.getElementById('server-selector').value;
+            const currentObj = state.guilds[state.currentGuild];
+            document.getElementById('active-guild-title').textContent = currentObj.name;
+            updateDashboardUI();
+        }
+
+        // POPULATE VÀ RENDER UI DASHBOARD
+        function updateDashboardUI() {
+            if (!state.isLoggedIn) return;
+
+            const currentObj = state.guilds[state.currentGuild];
+            
+            // Cập nhật thông tin số lượng Binds lên thẻ tổng quan
+            document.getElementById('overview-binds-count').textContent = `${currentObj.binds.length} Binds`;
+
+            // Render Bảng Binds
+            const tbody = document.getElementById('binds-table-body');
+            tbody.innerHTML = '';
+
+            if (currentObj.binds.length === 0) {
+                tbody.innerHTML = `
+                    <tr>
+                        <td colspan="4" class="py-8 text-center text-gray-500">
+                            Chưa cấu hình bất kỳ liên kết vai trò nào. Hãy nhấn nút "Tạo Bind Mới"!
+                        </td>
+                    </tr>
+                `;
+                return;
+            }
+
+            currentObj.binds.forEach(bind => {
+                const tr = document.createElement('tr');
+                tr.className = "border-b border-gray-800/40 hover:bg-gray-800/10 transition-colors";
+                tr.innerHTML = `
+                    <td class="py-4 px-2 font-mono text-gray-300 font-semibold">${bind.robloxGroupId}</td>
+                    <td class="py-4 px-2"><span class="bg-purple-500/15 text-purple-400 border border-purple-500/30 px-2.5 py-0.5 rounded text-xs">Rank: ${bind.rankId}</span></td>
+                    <td class="py-4 px-2 font-medium text-blue-400">${bind.discordRole}</td>
+                    <td class="py-4 px-2 text-right">
+                        <button onclick="deleteBind(${bind.id})" class="text-red-400 hover:text-red-300 bg-red-500/10 hover:bg-red-500/20 p-2 rounded-lg transition-all text-xs">
+                            <i class="fa-solid fa-trash-can"></i> Xóa
+                        </button>
+                    </td>
+                `;
+                tbody.appendChild(tr);
+            });
+        }
+
+        // XỬ LÝ ĐĂNG NHẬP DISCORD OAUTH2 THẬT
+        const CLIENT_ID = '1501815620797202442'; // ID Bot của bạn
+
+        function loginWithDiscord() {
+            // Lấy URL hiện tại làm redirect_uri (ví dụ: localhost hoặc domain của bạn)
+            const redirectUri = encodeURIComponent(window.location.href.split('#')[0]);
+            // Gọi URL xác thực của Discord
+            const oauthUrl = `https://discord.com/api/oauth2/authorize?client_id=${CLIENT_ID}&redirect_uri=${redirectUri}&response_type=token&scope=identify%20guilds`;
+            window.location.href = oauthUrl;
+        }
+
+        // Kiểm tra token khi tải trang (Nếu vừa từ Discord quay lại)
+        window.onload = () => {
+            const fragment = new URLSearchParams(window.location.hash.slice(1));
+            const [accessToken, tokenType] = [fragment.get('access_token'), fragment.get('token_type')];
+
+            if (accessToken) {
+                // Xóa token khỏi URL bar để giao diện sạch sẽ
+                window.history.replaceState({}, document.title, window.location.pathname + window.location.search);
+                
+                // Gọi Discord API để lấy thông tin người dùng
+                fetch('https://discord.com/api/users/@me', {
+                    headers: {
+                        authorization: `${tokenType} ${accessToken}`,
+                    },
+                })
+                .then(result => result.json())
+                .then(response => {
+                    const { username, discriminator, avatar, id } = response;
+                    
+                    // Discord hiện đã chuyển sang dạng tên không có tag (#0), kiểm tra để hiển thị chuẩn xác
+                    let displayTag = discriminator === '0' ? username : `${username}#${discriminator}`;
+                    let avatarUrl = avatar 
+                        ? `https://cdn.discordapp.com/avatars/${id}/${avatar}.png` 
+                        : 'https://cdn.discordapp.com/embed/avatars/0.png'; // Avatar mặc định
+
+                    state.isLoggedIn = true;
+                    state.user = {
+                        username: username,
+                        discriminator: discriminator,
+                        displayTag: displayTag,
+                        avatar: avatarUrl
+                    };
+
+                    updateNavbarState();
+                    // Tự động chuyển vào dashboard
+                    navigateTo('dashboard');
+                })
+                .catch(console.error);
+            }
+        };
+
+        function logout() {
+            state.isLoggedIn = false;
+            state.user = null;
+            updateNavbarState();
+            navigateTo('home');
+        }
+
+        // Cập nhật trạng thái hiển thị của Navbar (Chưa / Đã đăng nhập)
+        function updateNavbarState() {
+            const container = document.getElementById('auth-buttons-container');
+            const mobileContainer = document.getElementById('mobile-auth-container');
+
+            if (state.isLoggedIn) {
+                // Desktop Navbar State
+                container.innerHTML = `
+                    <div class="flex items-center space-x-3 cursor-pointer" onclick="navigateTo('dashboard')">
+                        <img src="${state.user.avatar}" class="w-8 h-8 rounded-full border border-discord shadow-inner">
+                        <span class="text-white font-semibold text-sm hover:text-blue-400 transition-colors">${state.user.displayTag}</span>
+                    </div>
+                    <button onclick="navigateTo('dashboard')" class="bg-discord hover:bg-discordHover text-white px-5 py-2.5 rounded-lg font-medium text-sm transition-all shadow-lg flex items-center">
+                        <i class="fa-solid fa-chart-line mr-2"></i> Bảng Điều Khiển
+                    </button>
+                `;
+                // Mobile Navbar State
+                mobileContainer.innerHTML = `
+                    <div class="flex items-center space-x-3 px-3 py-2 bg-gray-800 rounded-lg">
+                        <img src="${state.user.avatar}" class="w-8 h-8 rounded-full border border-discord">
+                        <span class="text-white font-semibold text-base">${state.user.displayTag}</span>
+                    </div>
+                    <button onclick="navigateTo('dashboard')" class="bg-discord text-white px-5 py-3 rounded-lg font-medium text-center">
+                        <i class="fa-solid fa-chart-line mr-2"></i> Bảng Điều Khiển
+                    </button>
+                    <button onclick="logout()" class="text-red-400 bg-red-500/10 border border-red-500/20 py-3 rounded-lg font-medium text-center">
+                        Đăng Xuất
+                    </button>
+                `;
+            } else {
+                // Reset về Trạng thái ban đầu
+                container.innerHTML = `
+                    <button onclick="loginWithDiscord()" class="text-gray-300 hover:text-white font-medium text-sm transition-colors">Đăng nhập</button>
+                    <button onclick="loginWithDiscord()" class="bg-discord hover:bg-discordHover text-white px-5 py-2.5 rounded-lg font-medium text-sm transition-all shadow-lg shadow-discord/30 flex items-center">
+                        <i class="fa-brands fa-discord mr-2"></i> Bảng Điều Khiển
+                    </button>
+                `;
+                mobileContainer.innerHTML = `
+                    <button onclick="loginWithDiscord()" class="text-gray-300 hover:text-white font-medium px-3 py-2 block text-center">Đăng nhập</button>
+                    <button onclick="loginWithDiscord()" class="bg-discord text-white px-5 py-3 rounded-lg font-medium text-center">
+                        <i class="fa-brands fa-discord mr-2"></i> Bảng Điều Khiển
+                    </button>
+                `;
+            }
+        }
+
+        // QUẢN LÝ BIND MỚI (TẠO/XÓA)
+        function openAddBindModal() {
+            document.getElementById('add-bind-modal').classList.remove('hidden');
+        }
+
+        function closeAddBindModal() {
+            document.getElementById('add-bind-modal').classList.add('hidden');
+        }
+
+        function createNewBind(event) {
+            event.preventDefault();
+            const groupId = document.getElementById('bind-group-id').value.trim();
+            const rankId = document.getElementById('bind-rank-id').value.trim();
+            const role = document.getElementById('bind-discord-role').value;
+
+            if (groupId && rankId) {
+                const newBindObj = {
+                    id: Date.now(),
+                    robloxGroupId: groupId,
+                    rankId: rankId,
+                    discordRole: role
+                };
+
+                state.guilds[state.currentGuild].binds.push(newBindObj);
+                updateDashboardUI();
+                closeAddBindModal();
+                
+                // Reset form
+                document.getElementById('bind-form').reset();
+
+                // Thêm một nhật ký hoạt động mô phỏng
+                const logList = document.getElementById('log-list');
+                const logDiv = document.createElement('div');
+                logDiv.className = "flex items-start justify-between text-sm py-2 border-b border-gray-800/50";
+                logDiv.innerHTML = `
+                    <div class="flex items-center space-x-3">
+                        <div class="w-2 h-2 rounded-full bg-blue-500"></div>
+                        <span class="text-gray-300">Đã thiết lập liên kết Roblox Group <strong>${groupId}</strong> (Rank ${rankId}) -> ${role}</span>
+                    </div>
+                    <span class="text-xs text-gray-500">Vừa xong</span>
+                `;
+                logList.prepend(logDiv);
+            }
+        }
+
+        function deleteBind(bindId) {
+            const currentObj = state.guilds[state.currentGuild];
+            currentObj.binds = currentObj.binds.filter(bind => bind.id !== bindId);
+            updateDashboardUI();
+        }
+
+        // LƯU FORM CÀI ĐẶT MÁY CHỦ
+        function saveSettings(event) {
+            event.preventDefault();
+            const prefix = document.getElementById('bot-prefix').value;
+            const messageEl = document.getElementById('settings-status-message');
+            
+            messageEl.classList.remove('hidden', 'bg-red-500/10', 'text-red-400', 'bg-green-500/10', 'text-green-400');
+            messageEl.classList.add('bg-green-500/10', 'text-green-400', 'border', 'border-green-500/20');
+            messageEl.innerHTML = `<i class="fa-solid fa-circle-check mr-2"></i> Cấu hình máy chủ đã được lưu thành công trên máy chủ! Prefix mới của GuardNexly là <strong>${prefix}</strong>.`;
+
+            setTimeout(() => {
+                messageEl.classList.add('hidden');
+            }, 4000);
+        }
+
+        // XỬ LÝ MENU MOBILE
+        const btn = document.getElementById('mobile-menu-btn');
+        const menu = document.getElementById('mobile-menu');
+
+        btn.addEventListener('click', () => {
+            menu.classList.toggle('hidden');
+        });
+
+        document.querySelectorAll('#mobile-menu a').forEach(link => {
+            link.addEventListener('click', () => {
+                menu.classList.add('hidden');
+            });
+        });
+
+        // BACKGROUND NAVBAR BIẾN ĐỔI KHI CUỘN
+        window.addEventListener('scroll', () => {
+            const nav = document.getElementById('navbar');
+            if (window.scrollY > 10) {
+                nav.classList.add('shadow-lg');
+            } else {
+                nav.classList.remove('shadow-lg');
+            }
+        });
+    </script>
+</body>
+</html>
