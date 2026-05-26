@@ -384,6 +384,22 @@
 
     <!-- MAIN VIEW: Dashboard -->
     <div id="view-dashboard" class="hidden min-h-screen pt-24 pb-16 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto">
+        <!-- BANNER BÁO BOT CHƯA VÀO SERVER (Ẩn mặc định) -->
+        <div id="bot-missing-banner" class="hidden mb-8 p-6 bg-yellow-500/10 border border-yellow-500/30 rounded-2xl flex flex-col md:flex-row items-center justify-between gap-4 animate-fade-up">
+            <div class="flex items-center space-x-4">
+                <div class="w-12 h-12 rounded-xl bg-yellow-500/20 flex items-center justify-center text-yellow-500 text-2xl flex-shrink-0">
+                    <i class="fa-solid fa-triangle-exclamation animate-bounce"></i>
+                </div>
+                <div>
+                    <h3 class="font-bold text-white text-lg">GuardNexly chưa tham gia máy chủ này!</h3>
+                    <p class="text-sm text-gray-400">Bạn cần mời bot GuardNexly vào server để thực hiện gán quyền và quét các vai trò (Roles) thực tế.</p>
+                </div>
+            </div>
+            <a id="invite-bot-server-link" href="#" target="_blank" class="bg-yellow-500 hover:bg-yellow-600 text-gray-950 font-bold px-6 py-3 rounded-xl text-sm transition-all shadow-lg shadow-yellow-500/10 flex items-center">
+                <i class="fa-solid fa-plus mr-2"></i> Mời GuardNexly Ngay
+            </a>
+        </div>
+
         <div class="grid grid-cols-1 lg:grid-cols-4 gap-8">
             <!-- Sidebar Panel -->
             <div class="lg:col-span-1">
@@ -509,7 +525,7 @@
                                 <h2 class="text-2xl font-bold text-white">Quản lý Binds (Liên Kết Vai Trò)</h2>
                                 <p class="text-sm text-gray-400">Ánh xạ trực tiếp thứ hạng nhóm Roblox sang vai trò tương ứng trong Discord.</p>
                             </div>
-                            <button onclick="openAddBindModal()" class="bg-blue-600 hover:bg-blue-500 text-white px-4 py-2.5 rounded-xl text-sm font-semibold flex items-center transition-all">
+                            <button onclick="openAddBindModal()" id="add-bind-btn-trigger" class="bg-blue-600 hover:bg-blue-500 text-white px-4 py-2.5 rounded-xl text-sm font-semibold flex items-center transition-all disabled:opacity-50 disabled:cursor-not-allowed">
                                 <i class="fa-solid fa-plus mr-2"></i> Tạo Bind Mới
                             </button>
                         </div>
@@ -534,6 +550,37 @@
 
                     <!-- TAB 3: SETTINGS -->
                     <div id="tab-content-settings" class="hidden space-y-8">
+                        <!-- CẤU HÌNH BOT TOKEN ĐỂ QUÉT THẬT -->
+                        <div class="p-6 bg-blue-500/5 border border-blue-500/10 rounded-2xl space-y-4">
+                            <div class="flex items-start space-x-3">
+                                <div class="text-blue-400 text-xl"><i class="fa-solid fa-key"></i></div>
+                                <div>
+                                    <h3 class="font-bold text-white text-base">Cấu hình Discord Bot Token (Dành cho Dev)</h3>
+                                    <p class="text-xs text-gray-400 mt-1">
+                                        Discord yêu cầu Bot Token để quét toàn bộ Roles và kiểm tra trạng thái Bot hoạt động chính xác từ máy chủ của bạn qua API Discord thực tế.
+                                    </p>
+                                </div>
+                            </div>
+                            
+                            <div class="space-y-3">
+                                <div class="relative">
+                                    <input type="password" id="dev-bot-token" placeholder="Nhập Bot Token của GuardNexly tại đây..." class="w-full bg-[#111422] border border-gray-800 hover:border-gray-700 focus:border-discord rounded-xl pl-4 pr-12 py-3.5 text-white focus:outline-none text-sm transition-all shadow-inner font-mono">
+                                    <button type="button" onclick="toggleTokenVisibility()" class="absolute inset-y-0 right-4 flex items-center text-gray-400 hover:text-white transition-colors">
+                                        <i class="fa-solid fa-eye" id="token-eye-icon"></i>
+                                    </button>
+                                </div>
+                                <div class="flex justify-between items-center text-xs text-gray-500">
+                                    <span>Lấy token tại <a href="https://discord.com/developers/applications" target="_blank" class="text-discord hover:underline">Discord Dev Portal</a></span>
+                                    <span>Lưu an toàn trong LocalStorage máy của bạn</span>
+                                </div>
+                                <div class="flex justify-end">
+                                    <button type="button" onclick="saveBotToken()" class="bg-discord hover:bg-discordHover text-white px-5 py-2.5 rounded-xl text-xs font-bold transition-all shadow-md">
+                                        Đồng bộ Token
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+
                         <div class="border-b border-gray-800 pb-5">
                             <h2 class="text-2xl font-bold text-white">Cài Đặt Máy Chủ</h2>
                             <p class="text-sm text-gray-400">Tinh chỉnh các thiết lập hệ thống tự động hóa của GuardNexly.</p>
@@ -593,66 +640,6 @@
             </div>
         </div>
     </div>
-
-    <!-- Footer -->
-    <footer class="bg-[#070a11] border-t border-gray-800 pt-16 pb-8">
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div class="grid grid-cols-1 md:grid-cols-4 gap-12 mb-12">
-                <div class="col-span-1 md:col-span-1">
-                    <div class="flex items-center mb-4">
-                        <div class="w-8 h-8 rounded-lg bg-gradient-to-br from-blue-500 to-purple-600 flex items-center justify-center text-white font-bold text-sm mr-2">
-                            <i class="fa-solid fa-shield-halved"></i>
-                        </div>
-                        <span class="font-bold text-xl text-white">GuardNexly</span>
-                    </div>
-                    <p class="text-gray-400 text-sm mb-6">
-                        Trình xác minh Discord - Roblox mạnh mẽ, tùy biến cao và ổn định nhất.
-                    </p>
-                    <div class="flex space-x-4">
-                        <a href="https://discord.com/oauth2/authorize?client_id=1501815620797202442&permissions=8&integration_type=0&scope=bot" target="_blank" class="text-gray-400 hover:text-white transition-colors"><i class="fa-brands fa-discord text-xl"></i></a>
-                        <a href="#" class="text-gray-400 hover:text-white transition-colors"><i class="fa-brands fa-twitter text-xl"></i></a>
-                        <a href="#" class="text-gray-400 hover:text-white transition-colors"><i class="fa-brands fa-github text-xl"></i></a>
-                    </div>
-                </div>
-                
-                <div>
-                    <h4 class="text-white font-bold mb-4 uppercase text-sm tracking-wider">Sản Phẩm</h4>
-                    <ul class="space-y-2 text-sm">
-                        <li><a href="#" class="text-gray-400 hover:text-blue-400 transition-colors">Tính năng</a></li>
-                        <li><a href="#" class="text-gray-400 hover:text-blue-400 transition-colors">GuardNexly Premium</a></li>
-                        <li><a href="#" class="text-gray-400 hover:text-blue-400 transition-colors">Trạng thái (Status)</a></li>
-                    </ul>
-                </div>
-
-                <div>
-                    <h4 class="text-white font-bold mb-4 uppercase text-sm tracking-wider">Tài Nguyên</h4>
-                    <ul class="space-y-2 text-sm">
-                        <li><a href="#" class="text-gray-400 hover:text-blue-400 transition-colors">Tài liệu API (Docs)</a></li>
-                        <li><a href="#" class="text-gray-400 hover:text-blue-400 transition-colors">Lệnh (Commands)</a></li>
-                        <li><a href="#" class="text-gray-400 hover:text-blue-400 transition-colors">Hỗ trợ / Support Server</a></li>
-                    </ul>
-                </div>
-
-                <div>
-                    <h4 class="text-white font-bold mb-4 uppercase text-sm tracking-wider">Pháp Lý</h4>
-                    <ul class="space-y-2 text-sm">
-                        <li><a href="#" class="text-gray-400 hover:text-blue-400 transition-colors">Điều khoản dịch vụ</a></li>
-                        <li><a href="#" class="text-gray-400 hover:text-blue-400 transition-colors">Chính sách bảo mật</a></li>
-                        <li><a href="#" class="text-gray-400 hover:text-blue-400 transition-colors">Chính sách hoàn tiền</a></li>
-                    </ul>
-                </div>
-            </div>
-            <div class="border-t border-gray-800 pt-8 flex flex-col md:flex-row justify-between items-center">
-                <p class="text-gray-500 text-sm">
-                    &copy; 2026 GuardNexly. Không được liên kết với Roblox Corporation hay Discord Inc.
-                </p>
-                <div class="mt-4 md:mt-0 flex items-center">
-                    <span class="flex h-2 w-2 rounded-full bg-green-500 mr-2"></span>
-                    <span class="text-sm text-gray-400">Tất cả các hệ thống hoạt động bình thường</span>
-                </div>
-            </div>
-        </div>
-    </footer>
 
     <!-- MODAL: TẠO BIND MỚI (CHỌN ROLE DISCORD THỰC TẾ SIÊU ĐẸP) -->
     <div id="add-bind-modal" class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-md hidden animate-fade-up">
@@ -715,7 +702,8 @@
             activeTab: 'overview',
             currentGuild: null,
             guilds: {}, // Đổ động từ API Discord
-            selectedRoleValue: null // Lưu trữ vai trò đang chọn trong modal
+            selectedRoleValue: null, // Lưu trữ vai trò đang chọn trong modal
+            botInSelectedGuild: false // Trạng thái bot đã vào server chưa
         };
 
         // Đóng dropdown khi click ra ngoài
@@ -758,6 +746,44 @@
             } else {
                 dropdown.classList.add('hidden');
                 chevron.classList.remove('rotate-180');
+            }
+        }
+
+        // Tải Token đã lưu từ trước (nếu có)
+        const savedToken = localStorage.getItem('guardnexly_bot_token');
+        if (savedToken) {
+            document.getElementById('dev-bot-token').value = savedToken;
+        }
+
+        function saveBotToken() {
+            const tokenInput = document.getElementById('dev-bot-token').value.trim();
+            if (tokenInput) {
+                localStorage.setItem('guardnexly_bot_token', tokenInput);
+                const msg = document.getElementById('settings-status-message');
+                msg.classList.remove('hidden');
+                msg.className = "p-4 rounded-xl text-sm bg-green-500/15 text-green-400 border border-green-500/30";
+                msg.innerHTML = "<i class='fa-solid fa-circle-check mr-2'></i> Đồng bộ và lưu trữ Bot Token thành công!";
+                setTimeout(() => msg.classList.add('hidden'), 3000);
+                
+                // Reload lại danh sách Roles cho Server hiện tại nếu đang đăng nhập
+                if (state.currentGuild) {
+                    fetchDiscordRolesForServer(state.currentGuild);
+                }
+            } else {
+                localStorage.removeItem('guardnexly_bot_token');
+                alert("Đã xóa Token. Hệ thống sẽ quay về chế độ nạp cấu hình mô phỏng.");
+            }
+        }
+
+        function toggleTokenVisibility() {
+            const input = document.getElementById('dev-bot-token');
+            const icon = document.getElementById('token-eye-icon');
+            if (input.type === "password") {
+                input.type = "text";
+                icon.classList.replace('fa-eye', 'fa-eye-slash');
+            } else {
+                input.type = "password";
+                icon.classList.replace('fa-eye-slash', 'fa-eye');
             }
         }
 
@@ -893,12 +919,13 @@
         function fetchDiscordRolesForServer(guildId) {
             const roleSelectLabel = document.getElementById('role-select-label');
             const optionsContainer = document.getElementById('role-dropdown-options');
+            const botToken = localStorage.getItem('guardnexly_bot_token');
             
             // Đặt trạng thái tải dữ liệu
             optionsContainer.innerHTML = `
                 <div class="px-4 py-3 text-sm text-gray-400 flex items-center space-x-2">
                     <i class="fa-solid fa-circle-notch animate-spin text-discord"></i>
-                    <span>Đang tải các vai trò thực tế từ API...</span>
+                    <span>Đang quét các vai trò thực tế từ máy chủ...</span>
                 </div>`;
                 
             document.getElementById('selected-role-display').innerHTML = `
@@ -907,67 +934,104 @@
             `;
             state.selectedRoleValue = null;
 
-            if (!state.isLoggedIn || !state.accessToken) {
+            if (!state.isLoggedIn) {
                 console.error("User chưa đăng nhập");
                 return;
             }
 
-            // Gọi API của bot hoặc cầu nối API Discord để lấy dữ liệu vai trò thật
-            // URL này trỏ đến API chính thống của Discord để lấy Role từ máy chủ (Hệ thống sẽ thử fetch, nếu không có Bot Token cấu hình trên Client, GuardNexly sẽ sử dụng API Endpoint Proxy)
-            fetch(`https://discord.com/api/v10/guilds/${guildId}/roles`, {
-                headers: {
-                    'Authorization': `Bot MTUwMTgxNTYyMDc5NzIwMjQ0Mg.G_your_bot_token_secret_auth_here_if_available` // Phân giải quyền Bot GuardNexly
-                }
-            })
-            .then(res => {
-                if (res.ok) {
-                    return res.json();
-                } else {
-                    // Nếu Client fetch trực tiếp bị chặn do CORS/Authorization, chúng ta chuyển sang dùng cổng nạp API dự phòng thông minh
-                    // Cổng nạp này lấy cấu hình vai trò chính xác từ máy chủ Discord của bạn thông qua việc giả lập API Bot đã phân giải
-                    return mockFetchRealDiscordRoles(guildId);
-                }
-            })
-            .then(roles => {
-                // Lọc bỏ role @everyone (có id trùng với guildId) để hiển thị danh sách vai trò thực tế sạch sẽ
-                const filteredRoles = roles.filter(role => role.id !== guildId);
+            // Trường hợp 1: Có cấu hình Bot Token -> Gửi yêu cầu thật qua Proxy
+            if (botToken) {
+                // Sử dụng CORS Proxy io để vượt rào cản CORS từ trình duyệt và gửi token
+                const targetUrl = `https://discord.com/api/v10/guilds/${guildId}/roles`;
+                const proxyUrl = `https://corsproxy.io/?` + encodeURIComponent(targetUrl);
 
-                // Lưu vai trò thật vào state
-                state.guilds[guildId].availableRoles = filteredRoles.map(role => ({
-                    id: role.id,
-                    name: role.name,
-                    color: role.color ? `#${role.color.toString(16).padStart(6, '0')}` : '#99AAB5'
-                }));
+                fetch(proxyUrl, {
+                    headers: {
+                        'Authorization': `Bot ${botToken}`
+                    }
+                })
+                .then(res => {
+                    if (res.ok) {
+                        state.botInSelectedGuild = true;
+                        toggleBotMissingBanner(false); // Ẩn banner lỗi bot chưa vào server
+                        return res.json();
+                    } else if (res.status === 404 || res.status === 403 || res.status === 401) {
+                        // Trả về lỗi phân quyền tức là bot chưa tham gia máy chủ đó
+                        state.botInSelectedGuild = false;
+                        toggleBotMissingBanner(true, guildId);
+                        throw new Error("Bot chưa vào server hoặc Token sai.");
+                    } else {
+                        throw new Error("API gặp sự cố.");
+                    }
+                })
+                .then(roles => {
+                    // Lọc bỏ role @everyone (có id trùng với guildId)
+                    const filteredRoles = roles.filter(role => role.id !== guildId);
 
-                renderRoleDropdownOptions(guildId);
-            })
-            .catch(err => {
-                console.error("Lỗi khi fetch Discord Roles:", err);
-                // Trường hợp ngoại lệ lỗi kết nối, kích hoạt Dynamic Role Parser dựa trên cấu trúc server thật của người dùng
+                    // Lưu vai trò thật vào state
+                    state.guilds[guildId].availableRoles = filteredRoles.map(role => ({
+                        id: role.id,
+                        name: role.name,
+                        color: role.color ? `#${role.color.toString(16).padStart(6, '0')}` : '#99AAB5'
+                    }));
+
+                    renderRoleDropdownOptions(guildId);
+                    updateDashboardUI();
+                })
+                .catch(err => {
+                    console.warn("Lỗi fetch Roles thật:", err.message);
+                    optionsContainer.innerHTML = `
+                        <div class="px-4 py-3 text-sm text-yellow-500">
+                            <i class="fa-solid fa-circle-exclamation mr-2"></i> Không quét được vai trò. Hãy mời bot hoặc kiểm tra lại Token!
+                        </div>`;
+                });
+            } else {
+                // Trường hợp 2: Không có Bot Token -> Quay về mô phỏng nhưng vẫn cảnh báo người dùng cách bật tính năng thật
                 mockFetchRealDiscordRoles(guildId).then(roles => {
+                    // Mặc định cho phép hiển thị nếu chưa bật Token
+                    state.botInSelectedGuild = true;
+                    toggleBotMissingBanner(false);
                     state.guilds[guildId].availableRoles = roles;
                     renderRoleDropdownOptions(guildId);
+                    updateDashboardUI();
                 });
-            });
+            }
         }
 
-        // HÀM KHÔI PHỤC VÀ DỰ PHÒNG GIẢ LẬP TRUY XUẤT ROLE THỰC TẾ CHẤT LƯỢNG CAO
+        // BẬT / TẮT BANNER CẢNH BÁO MỜI BOT VÀO SERVER
+        function toggleBotMissingBanner(show, guildId = '') {
+            const banner = document.getElementById('bot-missing-banner');
+            const addBindBtn = document.getElementById('add-bind-btn-trigger');
+            
+            if (show) {
+                banner.classList.remove('hidden');
+                addBindBtn.disabled = true; // Khóa tính năng tạo bind
+                
+                // Thiết lập đường link mời bot cá nhân hóa với guild_id tương ứng
+                const inviteLink = `https://discord.com/oauth2/authorize?client_id=${CLIENT_ID}&permissions=8&integration_type=0&scope=bot&guild_id=${guildId}`;
+                document.getElementById('invite-bot-server-link').href = inviteLink;
+            } else {
+                banner.classList.add('hidden');
+                addBindBtn.disabled = false; // Mở khóa nút tạo bind
+            }
+        }
+
+        // HÀM DỰ PHÒNG GIẢ LẬP TRUY XUẤT ROLE THỰC TẾ KHI CHƯA ĐỒNG BỘ TOKEN
         function mockFetchRealDiscordRoles(guildId) {
             return new Promise((resolve) => {
                 const activeGuildName = state.guilds[guildId].name;
                 
-                // Trả về danh sách vai trò có cấu trúc ID và Color hex thật tương ứng với máy chủ Discord đó
                 setTimeout(() => {
                     resolve([
-                        { id: "role_1", name: "👑 Owner / Sáng Lập", color: 0xF1C40F },
-                        { id: "role_2", name: `🛠️ Admin | ${activeGuildName}`, color: 0xE53935 },
-                        { id: "role_3", name: "🛡️ Ban Quản Trị / Mod", color: 0x3498DB },
-                        { id: "role_4", name: "💻 Developer Team", color: 0x9B59B6 },
-                        { id: "role_5", name: "🏆 Vanguard Elite VIP", color: 0xE67E22 },
-                        { id: "role_6", name: "✅ Roblox Verified", color: 0x2ECC71 },
-                        { id: "role_7", name: "👤 Community Member", color: 0x99AAB5 }
+                        { id: "role_1", name: "👑 Owner / Sáng Lập", color: "#F1C40F" },
+                        { id: "role_2", name: `🛠️ Admin | ${activeGuildName}`, color: "#E53935" },
+                        { id: "role_3", name: "🛡️ Ban Quản Trị / Mod", color: "#3498DB" },
+                        { id: "role_4", name: "💻 Developer Team", color: "#9B59B6" },
+                        { id: "role_5", name: "🏆 Vanguard Elite VIP", color: "#E67E22" },
+                        { id: "role_6", name: "✅ Roblox Verified", color: "#2ECC71" },
+                        { id: "role_7", name: "👤 Community Member", color: "#99AAB5" }
                     ]);
-                }, 300);
+                }, 100);
             });
         }
 
@@ -982,7 +1046,7 @@
             if (availableRoles.length === 0) {
                 optionsContainer.innerHTML = `
                     <div class="px-4 py-3 text-sm text-gray-400">
-                        Không tìm thấy vai trò nào trên máy chủ này.
+                        Không tìm thấy vai trò khả dụng nào.
                     </div>`;
                 return;
             }
@@ -1011,11 +1075,12 @@
             }
 
             // Hiển thị nhãn thông tin quét vai trò thật
+            const isMock = !localStorage.getItem('guardnexly_bot_token');
             roleSelectLabel.innerHTML = `
                 <span class="flex items-center justify-between">
                     <span>Vai trò Discord gán kèm</span>
-                    <span class="text-[10px] text-green-400 font-bold bg-green-500/10 px-2 py-0.5 rounded flex items-center border border-green-500/20">
-                        <i class="fa-solid fa-circle-check mr-1"></i> Quét thật: ${availableRoles.length} Roles
+                    <span class="text-[10px] ${isMock ? 'text-yellow-400 bg-yellow-500/10 border-yellow-500/20' : 'text-green-400 bg-green-500/10 border-green-500/20'} font-bold px-2 py-0.5 rounded flex items-center border">
+                        <i class="fa-solid ${isMock ? 'fa-triangle-exclamation' : 'fa-circle-check'} mr-1"></i> ${isMock ? 'Bản quét mô phỏng' : 'Quét thật từ Discord: ' + availableRoles.length + ' Roles'}
                     </span>
                 </span>
             `;
@@ -1060,6 +1125,20 @@
             // Render Bảng Binds
             const tbody = document.getElementById('binds-table-body');
             tbody.innerHTML = '';
+
+            // Nếu bot chưa ở trong máy chủ, hiển thị cảnh báo chặn cấu hình
+            if (!state.botInSelectedGuild && localStorage.getItem('guardnexly_bot_token')) {
+                tbody.innerHTML = `
+                    <tr>
+                        <td colspan="4" class="py-12 text-center text-yellow-500 bg-yellow-500/5 rounded-xl border border-dashed border-yellow-500/30">
+                            <i class="fa-solid fa-robot text-3xl mb-3 block"></i>
+                            <p class="font-semibold text-white">Chức năng quản trị bị khóa!</p>
+                            <p class="text-xs text-gray-400 mt-1 max-w-md mx-auto">Vui lòng bấm vào nút "Mời GuardNexly Ngay" ở banner cảnh báo phía trên để cấp quyền quản trị cho bot trước khi thiết lập binds.</p>
+                        </td>
+                    </tr>
+                `;
+                return;
+            }
 
             if (currentObj.binds.length === 0) {
                 tbody.innerHTML = `
@@ -1251,6 +1330,10 @@
         // QUẢN LÝ BIND MỚI (TẠO/XÓA)
         function openAddBindModal() {
             if(!state.currentGuild) return alert("Bạn không có máy chủ hợp lệ để tạo cấu hình.");
+            if(!state.botInSelectedGuild && localStorage.getItem('guardnexly_bot_token')) {
+                alert("Vui lòng mời Bot vào Server trước khi cấu hình!");
+                return;
+            }
             document.getElementById('add-bind-modal').classList.remove('hidden');
         }
 
